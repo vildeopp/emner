@@ -41,4 +41,14 @@ def get_vehiclesroutes_aslist(route):
         vehicle_route.append(node)
     return all_routes
 
+def get_full_route(routes:list):
+    full = []
+    for r in routes:
+        full = full + r
+        if routes.index(r) != (len(routes)-1):
+            full.append(0)
+    return full
+
+
+
 

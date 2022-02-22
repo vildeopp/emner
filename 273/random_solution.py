@@ -21,8 +21,16 @@ def random_sol():
 
     return route_pd
 
-def problem_used(): 
-    return data
+def random_dummy_route():
+    route = random.sample(range(1, data['calls']+1), data['calls'])
+    full_route = route + route
+    for _ in range(data['vehicles']):
+        full_route.insert(0,0)
+
+    return full_route
+
+
+
 
 
 

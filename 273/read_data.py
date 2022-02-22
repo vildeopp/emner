@@ -81,7 +81,7 @@ def read_data(filename):
     return all_data
 
 def read_problem(): 
-    return read_data(file4)
+    return read_data(file3)
 
 
 
