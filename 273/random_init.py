@@ -7,14 +7,13 @@ import blind_r_search as random_search
 import read_data as r
 import feasibility_check as f
 import print as p
-
 problem = r.read_problem()
 
 
 def random_solution_initializer(init_solution: list, iterations: int):
     print("Starting search\n")
 
-    init_cost = cost.f(problem, init_solution)
+    init_cost = cost.total_cost_cal(problem, init_solution)
 
     best_objective = init_cost
     sum_objectives = 0

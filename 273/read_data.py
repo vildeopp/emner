@@ -6,9 +6,7 @@ file4 = "data/Call_80_Vehicle_20.txt"
 file5 = "data/Call_130_Vehicle_40.txt"
 file6 = "data/Call_300_Vehicle_90.txt"
 
-def read_data(filename): 
-
-    all_data = {}
+def read_data(filename):
 
     with open(filename, "r") as f: 
         file = f.readlines()
@@ -81,7 +79,7 @@ def read_data(filename):
     return all_data
 
 def read_problem(): 
-    return read_data(file3)
+    return read_data(file1)
 
 
 

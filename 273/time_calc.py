@@ -14,7 +14,7 @@ def time_feasability(solution: list, vehicle: int):
     route_nodes = r.call_to_nodes(problem, route_calls) #route represented as nodes
 
     if not route_nodes:
-        print("no nodes in car's route")
+        #print("no nodes in car's route")
         return True
 
     start_node = vehicle_info[0]
@@ -52,11 +52,11 @@ def time_feasability(solution: list, vehicle: int):
             up_tm_wd = c_info[5] #upper timewindow
 
             if time_used < lw_tm_wd:
-                print("lower window for pickup")
+                #print("lower window for pickup")
                 wait = lw_tm_wd - time_used
                 time_used += wait
             if time_used > up_tm_wd:
-                print("upper window for pickup")
+                #print("upper window for pickup")
                 return False
 
             time_used += node_info.get(key)[0]
@@ -65,11 +65,11 @@ def time_feasability(solution: list, vehicle: int):
             lw_tm_wd = c_info[6] #lower timewindow
             up_tm_wd = c_info[7] #upper timewindow
             if time_used < lw_tm_wd:
-                print("lower window for delivery")
+                #print("lower window for delivery")
                 wait = lw_tm_wd - time_used
                 time_used += wait
             if time_used > up_tm_wd:
-                print("upper window for delivery")
+                #print("upper window for delivery")
                 return False
             time_used += node_info.get(key)[2]
 

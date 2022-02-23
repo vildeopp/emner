@@ -63,9 +63,6 @@ def total_cost_cal(problem, solution):
     return total_cost
 
 
-def f(problem,solution): 
-    return total_cost_cal(problem, solution)      
-
 
         
 
