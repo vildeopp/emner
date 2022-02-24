@@ -39,7 +39,6 @@ def time_feasability(solution: list, vehicle: int):
             time_used += travel_time.get(key)[0]
         except TypeError as e:
             break
-        print(time_used)
 
         if dest_node is None: #if at the end of the route breaks the loop
             break

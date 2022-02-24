@@ -1,5 +1,4 @@
-from audioop import avg
-from datetime import date, datetime
+from datetime import datetime
 import sys
 
 import cost_calculation as cost
@@ -7,6 +6,7 @@ import blind_r_search as random_search
 import read_data as r
 import feasibility_check as f
 import print as p
+
 problem = r.read_problem()
 
 
@@ -31,10 +31,9 @@ def random_solution_initializer(init_solution: list, iterations: int):
         if total_runtime < best_runtime:
             best_runtime = total_runtime
 
+    avg_obj = sum_objectives / iterations
 
-    avg_obj = sum_objectives/iterations
-    
-    p.print_sol(avg_obj, best_objective, init_cost, best_runtime, 
+    p.print_sol(avg_obj, best_objective, init_cost, best_runtime,
                 best_solution, f.feasibility(problem, best_solution))
 
     print("\nSearch ended")
