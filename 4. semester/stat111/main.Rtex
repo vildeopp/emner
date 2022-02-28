@@ -1,0 +1,343 @@
+\documentclass{article} 
+\usepackage{geometry} \geometry{ a4paper, total={210mm,297mm},
+  left=20mm, right=20mm, top=20mm, bottom=20mm, bindingoffset=0mm }
+\usepackage{amsmath}
+\usepackage{enumitem}
+
+%% Get rid of the indentation
+\usepackage[parfill]{parskip}
+
+%%  Enable the use of Norwegian letters.
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+%%  \usepackage[english, norsk]{babel}
+
+%%  Simplify the task of introducing references.
+\usepackage{fancyref}
+%% Enable the use of links in the document:
+\usepackage{hyperref} 
+\usepackage{cleveref} 
+
+
+\begin{document}
+
+<<label=setup, echo=FALSE, include=FALSE>>=
+###-------------------------------------------------------------------
+## Some global settings for knitr
+options(encoding = "UTF-8")
+
+## Path to figures, ensuring easier inspection later on.
+fig.path <- "figure/ex0-"
+
+
+## Some global settings
+knit_hooks$set(crop = hook_pdfcrop)
+opts_chunk$set(out.width = '.49\\linewidth', 
+               fig.show = 'hold',
+               fig.pos = 'h',
+               fig.align = 'center',
+               .path = fig.path,
+               warning = FALSE,
+               cache = TRUE,
+               autodep = TRUE,
+               ##
+               crop = TRUE)
+dep_auto()
+knit_theme$set("acid")
+
+## Note: Both specification of fig.show='hold' and out.with less than
+## half of the linewidth is needed in order to get the plots side by
+## side.  The specification of crop=TRUE removes unneeded white margins
+## from the plots.
+
+##  Specification of 'seed' is not really necessary in this mandatory task, 
+##  since  no simulations are required.  But it's nevertheless included since 
+##  the template use some samples
+set.seed(seed = 543)
+@
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% Start of exercise
+\begin{center}
+  \textbf{\Huge Obligatorisk innlevering 2\\
+    \large  STAT111}
+\end{center}
+
+Innlevering fra: Vilde Dahl Oppegård
+
+\vspace{1cm}
+
+\begin{enumerate}
+\item %
+  \textbf{Kapittel 12.2, oppgave 16 side 637} \\
+  Oppgaven spør om det er en betydelig sammenheng mellom foreldres gjennomsnittshøyde og høyden til datteren deres. Under får vi gjennomsnittshøyden til 11 foreldre og døttrene deres. 
+
+<<label = "1">>=
+##  Definer vektorene 
+Midparent <- c(66.0, 65.5, 71.5, 68.0, 70.0, 65.5, 67.0, 70.5, 69.5, 64.5, 67.5)
+Daughter  <- c(64.0, 63.0, 69.0, 69.0, 69.0, 65.0, 63.0, 68.5, 69.0, 64.0, 67.0)
+@     
+
+
+\begin{enumerate}[label=(\alph*)]
+\item %
+  Plot sammenhengen mellom gjennomsnittshøyden til foreldrene og høyden til døttrene deres. Kommenter styrken på sammenhengen.
+  
+<<label = "1a", echo = TRUE, fig.cap = "Spredningsplott for oppgave 1a">>=
+##  Lag figur
+.x <- Midparent
+.y <- Daughter
+.main <- "Sactterplot - parents avarage height vs. daughter's height"
+.xlab <- "Parents avarage height"
+.ylab <- "Daughters height"
+plot(x = .x, y = .y, type = "p", , las = 1, 
+     main = .main, xlab = .xlab, ylab = .ylab)
+@     
+
+\textbf{Konklusjon:} \\ Kan se av plottet at det er en positiv trend mellom gjennomsnitts høyden til foreldrene og datterens høyde. Det betyr at hvis gjennomsnitts høyden til foreldrene øker, øker også datterens høyde. Det er ikke mulig enda å si noe om sammenhengen er signikant ved å bare se på plottet 
+
+
+\item %
+    Er døtrenes høyde bare bestemt av gjennomsnitts høyden til foreldrene? \\ Nei biologisk å spiller det så klart andre faktorer inn. Men man kan se på plottet også at hvis høyden bare avhenger av gjennomsnitts høyden til foreldrene så ville man kunnet dra en rett linje mellom alle punktene. Da ville korrelasjon koeffisienten være 1, som betyr at forholdet mellom de to variablene ikke kan være sterkere. 
+  
+\item %
+  Lag en lineær regresjon som predikerer datterens høyde gitt gjennomsnitts høyden til foreldrene. Predikere høyden til datteren hvis gjennomsnitts høyden til foreldrene er 70 in. Forklar hvorfor man ikke burde predikere en verdi for høyden til datteren hvis gjennomsnittshøyden til foreldrene er 74 in. 
+  
+    
+<<label = "1c">>=
+.linear_model_y_explained_by_x <- lm(formula = .y ~ .x)
+#utskrift av den lineære modellen 
+.linear_model_y_explained_by_x
+
+
+a <- .linear_model_y_explained_by_x$coefficients[2]
+b <- .linear_model_y_explained_by_x$coefficients[1]
+
+
+#lage en linje ved hjelp av stigningstall og konstantledd 
+.regresjonslinje <- function(x) {a * x + b}
+
+#i oppgaven bli vi gitt en innverdi på 70 
+.inn_verdi = 70
+.verdi <- .regresjonslinje(.inn_verdi)
+print(.verdi)
+@ 
+
+<<echo = FALSE>>=
+##  For å unngå mange desimaler i svaret ut, kan det lønne seg å bruke
+##  en skjult kodeblokk til å frisere svaret.  Repeter reglene for 
+##  hvor mange tellende siffer du bør ha i svaret om du er i tvil om hvor 
+##  mange siffer som bør vere med.
+.verdi <- signif(.verdi, digits = 3)
+@ 
+
+\textbf{Konklusjon:}\\ \textbf{Del 1: }Kan se at modellen gir den predikerte høyden 68.5 (utverdien) til datteren når gjennomsnitts høyden til foreldrene er 70 (innverdien). Dette passer også overens med den positive treng man så i dataene i plottet i oppgave a). \\ \textbf{Del 2: }Det finnes ingen nåværende data rundt 74, det tilsier at en predikerte verdi med innverdi 74 vil ha mer usikkerhet. Usikkerhete vil øke når vi bruker innverdier som er lengere fra gjennomsnittet. Det kan man også se i varians uttrykket for en predikert verdi. \\
+
+Koden kompilerte ikke til pdf på grunn av variablene som ble satt inn her. Vet ikke helt årsaken, men fjernet det og er derfor jeg bare printer variablene i koden for å vise at jeg har beregnet svaret mitt. 
+
+\item %
+  Beregn verdiene av SSE, SST og \(R^2\). Bruk dette til å diskutere hvor godt det er å bruke gjennomsnittshøyden til foreldrene for å predikere høyden til døttrene. 
+
+
+<<label = "1d", echo = TRUE>>=
+##  Utregning av SSE, SST og r.squared kan gjøres direkte ved å hente ut
+##  residualene og bruke formlene på side 631, 633 og 634.
+.residualer <- residuals(.linear_model_y_explained_by_x)
+SSE <- sum(.residualer^2)
+SST <- sum((.y - mean(.y))^2)
+r.squared <- 1 - SSE/SST
+##  Alternativt kan dere finne SSE ved å se på resultatet fra `anova` og
+##  dere kan finne r.squared ved å se på resultatet fra `summary`.
+.summary <- summary(object = .linear_model_y_explained_by_x)
+.anova <- anova(object = .linear_model_y_explained_by_x)
+@ 
+
+
+<<echo = FALSE>>=
+##  Skjult kodeblokk som bestemmer tallet tellende siffer som kommer med i 
+##  teksten når `Sexpr` blir brukt
+SSE <- signif(x = SSE, digits = 3)
+SST <- signif(x = SST, digits = 3)
+r.squared <- signif(x = r.squared, digits = 3)
+@ 
+
+
+\textbf{Konklusjon:} De beregnede verdiene for SSE, SST og $r^2$ blir
+\Sexpr{SSE}, \Sexpr{SST} og \Sexpr{r.squared}. $r^2$ har et intervall mellom 0 og 1, dermed kan vi si at den er moderat høy i dette tilfelle. Da kan man si at å bruke gjennomsnittshøyden til foreldrene er en grei måte å predikere høyden til foreldrene. 
+
+\item %
+  Kan se av datasettet at gjennomsnittshøyden til foreldrene ofte er litt høyere enn høyden til døttrene deres. Er dette som menes med regresjon mot gjennomsnittet? \\
+  \textbf{Konklusjon: }\\ Forventet verdi for gjennomsnitts høyden til foreldrene er $E[X]$ mens den forventede høyden til datteren gitt gjennomsnitts høyden til foreldrene er $E[Y|X]$. Dersom vi har en ekstremverdi av X, enten at foreldrene er veldig høye eller veldig lave vil denne høyden avvike fra $E[X]$. Selv om foreldrene er ekstrem høye vil ikke dette nødvendigvis føre til at døttrene vil avvike like mye fra den forventede høyden, altså dette vil føre til at Y|X er næremere $E[Y|X]$ enn foreldrene er $E[X]$. \\
+  Dermed kan vi si at dette datasettet ikke er et eksempel på regresjon mot gjennomsnitt. Dette fordi datterens høyde er forventet til å være lavere enn gjennomsnittshøyden til foreldrene. 
+
+
+\end{enumerate}
+
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\item %
+  \textbf{Kapittel 12.6, oppgave 71 side 680} \\
+    Oppgaven spør om sammenhengen mellom motstandsdyktigheten mellom kjernereaktorer laget av Zircaloy-2 og oksidbelegges tykkelse. 
+
+<<label = "2">>=
+##  Definer vektorene 
+x <- c(0, 7, 17, 114, 133, 142, 190, 218, 237, 285)
+y <- c(20.3, 19.8, 19.5, 15.9, 15.1, 14.7, 11.9, 11.5, 8.3, 6.6)
+@     
+
+\begin{enumerate}[label=(\alph*)]
+\item %
+  
+<<label = "2a", echo = TRUE, fig.cap = "Residualer for oppgave 2a">>=
+.x <- x
+.y <- y
+.lin_mod_y_vs_x <- lm(formula = .y ~ .x)
+.residuals <- .lin_mod_y_vs_x$residuals
+##  Et mer direkte alternativ få å hente ut residualene er:
+residuals(.lin_mod_y_vs_x)
+##  Lag et plott som viser '.x' versus '.residuals'
+.main <- "Plot: Oxide-layer vs. Residuals"
+.xlab <- "Oxide-layer"
+.ylab <- "Residuals"
+plot(x = .x, y = .residuals, type = "p", , las = 1, 
+     main = .main, xlab = .xlab, ylab = .ylab)
+##  Legg til horisontal linje med skjæringspunkt '0'
+abline(h = 0, col = "red", lty = 2)
+@ 
+
+\textbf{Konklusjon:} Kan se av plottet at residualene ligger spredt rundt y = 0. Siden det er såpass få punkter er det ikke mulig å trekke noen konklusjon om sammenhengen. Modellen vil være godkjent hvis punktene ligger spredt jevnt rundt y = 0 uten noe klart mønster, dette tyder på lik varians. 
+
+\item %
+  <Oppdater koden under slik at du får ut de to ønskede plottene, og
+  gi din konklusjon basert på dette.>
+  
+<<label = "2b", fig.cap = "Standardiserte residualer og normal-sannsynsplott for oppgave 2b">>=
+##  Bruk 'rstandard' til å regne ut de standardiserte residualene.
+.standard_res <- rstandard(model = .lin_mod_y_vs_x)
+##  Lag et plott som viser '.x' versus '.standard_res'
+.main <- "Oxide-thickness vs. standardized residuals"
+.xlab <- "Oxide-thickness"
+.ylab <- "standardized residuals"
+plot(x = .x, y = .standard_res, type = "p", , las = 1, 
+     main = .main, xlab = .xlab, ylab = .ylab)
+##  Legg til horisontal linje med skjæringspunkt '0'
+abline(h = 0, col = "red", lty = 2)
+##  Lag et normal-sannsynsplott for de standardiserte residualene.
+.main <- "normal probability plot: standardized residuals"
+.xlab <- "Quantiles"
+.ylab <- "Quantiles of standardized residuals"
+qqnorm(.standard_res, las = 1,
+       main = .main, 
+       xlab = .xlab,  
+       ylab = .ylab)
+##  Legg til linje gjennom første og tredje kvartil.
+qqline(.standard_res, col = "red", lty = 2)
+@   
+
+\textbf{Konklusjon:} \\ figuren til venstre forteller det samme som figuren i a) men verdiene har fått et nytt utfallsrom. I normalplottet til høyere ser vi at residualene ligger nesten på linje, som kan forventes dersom de skal følge standard normalfordeling. Da burde de teoretiske kvantilene stemme relativt overens med de observerte kvantilene.  
+
+
+\end{enumerate}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\item %
+  \textbf{Kapittel 14.1, oppgave 4 side 764} \\
+  tilfeldige data fra 15 hvor lang tid repratører bruker på å finne en spesifikk feil hos bestemt type biler sendt inn på reperasjon. Bruk en Wilcoxon test med signifkant level $\alpha = 0.1$ til å beregne om dataene viser at mekanikerne bruker i gjennomsnitt mindre enn 30 min på å finne den spesifikke feilen.
+
+<<label = "3">>=
+##  Skriv inn observasjonene:
+observasjoner <- c(30.6, 30.1, 15.6, 26.7, 27.1, 25.4, 35.0, 30.8, 
+                   31.9, 53.2, 12.5, 23.2, 8.8, 24.9, 30.2)
+##  Gjør relevante endringer av koden under, så du får svart på spørsmålet.
+.x <- observasjoner
+##  Definer mu som skal brukes i testen, og regn ut test-observatoren:
+.mu0 <- 30 #"test" verdien oppgitt i oppgaventeksten
+.centered <- .x - .mu0 #differansen
+.signed_ranks <- sign(.centered) * rank(abs(.centered))
+s_pluss <- sum(.signed_ranks[.signed_ranks > 0]) #test statistic 
+
+##  Finc den kritiske verdien 'c1' for dette tilfellet.
+##  (Formelen under gjennskaper tabell A.12 på side 809.)
+.level <- 0.1
+.c1 <- 1 + qsignrank(p = .level, n = length(.x), lower.tail = FALSE)
+.c2 <- (15*(15+1))/2 - .c1    #c2 = n(n+1)/2 pr. def fra boken
+
+print(.c1); print(.c2)
+@     
+
+
+\textbf{Konklusjon:} \\
+\textbf{Hypotesetestingen: }
+\begin{center}
+    $H_{0} : \mu \geq 30$ \\
+    $H_{a} : \mu < 30 $
+\end{center}
+Forkaster $H_{0}$ dersom test-observatøren er liten nok. Vi kan forvente at $P(S_{+} > c_{1}) = P(S_{+} < c_{2}) $, der $c_{2} = \Sexpr{.c2}$, som beregnet i R-koden. 
+
+Ettersom vi kan se at $S_{+} = \Sexpr{s_pluss} > c_{2} = \Sexpr{.c2}$ velger vi å ikke forkaste $H_{0}$
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\item %
+  \textbf{Kapittel 14.2, oppgave 12 side 770} \\
+  En studie som sammenligner kotinin-nivået hos spedbarn som har blitt utsatt for passiv røyking og ikke har blitt eksponert. Vi ønsker å se om kotin-nivået er 25 ganger høyere hos spedbarn som har passivt røyket enn spedbarn som ikke har blitt eksponert. 
+    
+<<label = "4">>=
+Unexposed <- c(8, 11, 12, 14, 20, 43, 111)
+Exposed <- c(35, 56, 83, 92, 128, 150, 176, 208)
+#merknad m <= n 
+m = min(length(Unexposed), length(Exposed))
+n = max(length(Unexposed), length(Exposed))
+
+.x <- Unexposed 
+.y <- Exposed 
+
+Delta <- -25 #skiftet mellom datasamlingene 
+
+#test-observator 
+w <- sum(rank(c(.x-Delta, .y ))[1:m])
+
+.c1 <- 71 #fra tabell A.13 
+.c2 <- m*(m+n+1) - .c1   #bruker m og n verdiene beregnet over 
+print(.c1); print(.c2)
+
+#wilcoxon test fra R
+wilcox.test(x = .x, y = .y, alternative = 'less', mu = -25)
+
+
+
+@
+  
+
+\textbf{Konklusjon:} 
+
+\textbf{Hypotesen: }
+
+\begin{center}
+    $H_{0}: \mu_{Y} \leq \mu_{X} + 25 \Longleftrightarrow \mu_{Y} - \mu_{X} \geq \Delta_{0} = - 25 $
+    
+    $H_{a}: \mu_{Y} - \mu{X} < \Delta_{0} = - 25$
+\end{center}
+
+Vi skal forkaste $H_{0}$ dersom $w = \Sexpr{w}$ er liten nok. Fra tabell A.13 kan man se at $c_{1}$ som skal oppfylle $ P(W \geq c_{1}) \approx 0.05 $ må da være $c_{1} = \Sexpr{.c1}$. Dette medfører at vi får: $c_{2} = \Sexpr{.c2}$ slik som det er beregnet i R-koden. 
+
+Dette betyr at w er mindre enn $c_{2}$: $ w = \Sexpr{w} < \Sexpr{.c2} = c_{2}$ som medfører at vi forkaster $H_{0} $ til fordel for $H_{a}$. Det betyr at differansen i kotin-nivået hos barn som har passiv røyket sammenlignet med barn som ikke har det er i følge de data som er oppgitt større enn 25. 
+
+
+
+
+\end{enumerate}
+  
+  %%%%% 
+    
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\end{document}

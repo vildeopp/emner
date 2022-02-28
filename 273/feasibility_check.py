@@ -30,7 +30,7 @@ def feasibility(problem, solution):
                 #checks if the current load is larger than the current capacity 
             if current_load > current_cap: 
                 feasible = False
-                print("Load is larger than capacity")
+                #print("Load is larger than capacity")
                 break
                 
                 #Check call and vehicle compatibility

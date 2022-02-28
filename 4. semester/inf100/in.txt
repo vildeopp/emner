@@ -1,0 +1,10 @@
+0 is fun
+1 is lame
+2 is fun
+3 is lame
+4 is fun
+5 is lame
+6 is lame
+7 is lame
+8 is fun
+9 is fun

@@ -4,7 +4,7 @@ from route import get_vehiclecalls_aslist, get_full_route
 def one_reinsert(solution, num_vehicles):
     calls = get_vehiclecalls_aslist(solution)
     if num_vehicles > 1:
-        rand = rnd.randrange(1, num_vehicles)
+        rand = rnd.randrange(0, num_vehicles)
         reinsert_list = calls[rand]
     else:
         reinsert_list = calls[0]
@@ -17,7 +17,7 @@ def one_reinsert(solution, num_vehicles):
         rand_index = rnd.randrange(0, len(reinsert_list))
         reinsert_list.insert(rand_index, elem)
     print(reinsert_list)
-    calls[rand] = reinsert_list
+    calls[rand-1] = reinsert_list
     return get_full_route(calls)
 
 def two_exchange(solution, num_vehicles):

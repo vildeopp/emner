@@ -1,19 +1,20 @@
 import read_data as x
-import random 
+import random
 
 data = x.read_problem()
 
-#this is not feasible
+
+# this is not feasible
 def random_sol():
-    route = random.sample(range(1, data['calls']+1), data['calls']) #deciding the route
-    rand_index = random.sample(range(1, data['calls']), data['vehicles']-1) #for placing the change of cars
+    route = random.sample(range(1, data['calls'] + 1), data['calls'])  # deciding the route
+    rand_index = random.sample(range(1, data['calls']), data['vehicles'] - 1)  # for placing the change of cars
 
     for i in rand_index:
         route.insert(i, 0)
 
-    #adding the calls twice (pick up then delivery)
+    # adding the calls twice (pick up then delivery)
     route_pd = []
-    for n in route: 
+    for n in route:
         if n == 0:
             route_pd.append(n)
             continue
@@ -22,19 +23,20 @@ def random_sol():
 
     return route_pd
 
+
 def new_random_sol():
-    avail_calls = [x for x in range(1,data['calls']+1)]
-    avail_vehicles = data['vehicles']
+    avail_calls = [x for x in range(1, data['calls'] + 1)]
+    avail_vehicles = int(data['vehicles'])
     count = 0
     routes = []
-    while len(avail_calls) != 0 :
+    while len(avail_calls) != 0:
         route = []
         count += 1
         if not avail_calls:
             break
-        if count > data['vehicles']:
+
+        if count > avail_vehicles:
             for c in avail_calls:
-                avail_calls.remove(c)
                 route.append(c), route.append(c)
             routes.append(route)
             break
@@ -50,31 +52,23 @@ def new_random_sol():
             routes.append(route)
     return combine_routes(routes)
 
+
 def combine_routes(routes):
-    list = []
+    liste = []
     for r in routes:
-        if routes.index(r)+1 == len(routes):
-            list = list + r
+        if routes.index(r) + 1 == len(routes):
+            liste = liste + r
         else:
-            list = list + r
-            list.append(0)
+            liste = liste + r
+            liste.append(0)
 
-    return list
+    return liste
 
-
-
-#to make a random route where only the dummy vehicle is used
+# to make a random route where only the dummy vehicle is used
 def random_dummy_route():
-    route = random.sample(range(1, data['calls']+1), data['calls'])
+    route = random.sample(range(1, data['calls'] + 1), data['calls'])
     full_route = route + route
     for _ in range(data['vehicles']):
-        full_route.insert(0,0)
+        full_route.insert(0, 0)
 
     return full_route
-
-
-
-
-
-
-
