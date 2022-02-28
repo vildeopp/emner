@@ -1,0 +1,6 @@
+reset;
+option solver cplex;
+model Refineryplan-model-VildeOppegård.mod
+data Refineryplan-data-VildeOppegård.dat
+solve;
+display total_cost, x;

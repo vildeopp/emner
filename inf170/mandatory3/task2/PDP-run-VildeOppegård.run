@@ -1,0 +1,6 @@
+reset;
+model PDP-model-VildeOppegård.mod;
+data PDP-data-VildeOppegård.dat;
+option solver cplex;
+solve;
+display x, objective, y, t, l;

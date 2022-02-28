@@ -1,0 +1,10 @@
+reset; 
+var t; 
+var m; 
+maximize People: 1.8 * t + m;
+subject to Budget: 10000*m + 20000*t <= 1000000;
+subject to tvRest: t >= 10; 
+subject to magRest: m >= 0; 
+subject to peopleRest: 3*m + t <= 100;
+solve; 
+display t, m;  

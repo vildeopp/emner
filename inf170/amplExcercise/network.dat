@@ -1,0 +1,25 @@
+data;
+
+set CITIES := A B C D E F;
+
+set LINKS := (A,B) (A,C)
+             (B,C) (B,E) (B,D)
+             (D,E) (D,F) (E,F) ;
+
+param supply  default 0 := A 100, B 50 ;
+
+param demand  default 0 :=
+  BOS  90,  EWR 120,  BWI 120,  ATL  70,  MCO  50;
+
+param:        capacity  :=
+  A B       13
+  A c       12
+
+  B C       1
+  B E       
+  NE BWI        100
+
+  SE EWR        100
+  SE BWI        100
+  SE ATL        100
+  SE MCO        100 ;

@@ -1,0 +1,19 @@
+
+model sudoku-vilde.mod; 
+data sudoku-Vilde.dat; 
+
+option solver cplex; 
+solve;
+
+print "---------------------------------";
+for{i in N}{
+	for{j in N}{
+		for{k in N}{
+			if(x[i,j,k] == 1) then printf "%3i",k; 
+		};
+		if((j mod 3) == 0) then printf " |"; 
+		if((j mod 9) == 0) then printf "\n";
+	};
+	if((i mod 3) == 0) then print "---------------------------------"; 
+}; 
+	

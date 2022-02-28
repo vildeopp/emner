@@ -1,0 +1,16 @@
+data;
+
+param: ORIG: supply	:= 
+		LA     1000
+		Det    1500
+		New   1200; 
+		
+param: DEST:  demand := 
+		Denver 	2300
+		Miami 	1400; 
+
+param cost: 
+			Denver	Miami := 
+		LA 	8000	21520
+		Det 10000	10800
+		New 10200	6800;

@@ -1,0 +1,63 @@
+
+A) 
+ampl: include '/Users/oppegard/Documents/inf170/mandatory3/task3/Refineryplan-run-VildeOppegård.run';
+CPLEX 20.1.0.0: optimal integer solution; objective 3275000
+66 MIP simplex iterations
+0 branch-and-bound nodes
+total_cost = 3275000
+
+x :=
+prt1 vls3        0
+prt1 vsl1    2e+05
+prt1 vsl2        0
+prt1 vsl4        0
+prt2 vls3        0
+prt2 vsl1        0
+prt2 vsl2        0
+prt2 vsl4   120000
+prt3 vls3        0
+prt3 vsl1        0
+prt3 vsl2   260000
+prt3 vsl4        0
+prt4 vls3        0
+prt4 vsl1    60000
+prt4 vsl2        0
+prt4 vsl4        0
+prt5 vls3        0
+prt5 vsl1        0
+prt5 vsl2        0
+prt5 vsl4   110000
+;
+
+
+
+B) 
+
+ampl: include '/Users/oppegard/Documents/inf170/mandatory3/task3/Refineryplan-run-VildeOppegård.run';
+CPLEX 20.1.0.0: optimal integer solution; objective 2935000
+1300 MIP simplex iterations
+175 branch-and-bound nodes
+total_cost = 2935000
+
+:          X1     X2       X3       x       :=
+prt1 vls3   0        0        0        0
+prt1 vsl1   0        0        0        0
+prt1 vsl2   0        0   180000   180000
+prt1 vsl4   0        0        0        0
+prt2 vls3   0        0        0        0
+prt2 vsl1   0    1e+05        0    1e+05
+prt2 vsl2   0        0        0        0
+prt2 vsl4   0        0        0        0
+prt3 vls3   0        0        0        0
+prt3 vsl1   0        0   260000   260000
+prt3 vsl2   0        0        0        0
+prt3 vsl4   0        0        0        0
+prt4 vls3   0        0        0        0
+prt4 vsl1   0        0        0        0
+prt4 vsl2   0    1e+05        0    1e+05
+prt4 vsl4   0        0        0        0
+prt5 vls3   0        0        0        0
+prt5 vsl1   0        0        0        0
+prt5 vsl2   0        0        0        0
+prt5 vsl4   0   110000        0   110000
+;

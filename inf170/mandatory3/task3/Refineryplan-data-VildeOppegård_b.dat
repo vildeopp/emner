@@ -1,0 +1,33 @@
+data; 
+set P := prt1 prt2 prt3 prt4 prt5;
+set V := vsl1 vsl2 vls3 vsl4;
+
+param d := 750000;
+
+param:	T1	T2	T3 := 
+prt1	6	5	4
+prt2	5	4	3
+prt3	6	4	2
+prt4 	7	5	5
+prt5 	3	3	1; 
+
+param cost:
+		vsl1	vsl2	vls3	vsl4 :=
+prt1	5		7		6		5
+prt2	4		3		4		2
+prt3	5		4		5		4
+prt4	7		9		7		6
+prt5	3		2		3		1;
+
+param: 		s_P			c_P :=
+prt1		200000		20000
+prt2		120000		20000
+prt3		260000		30000
+prt4		180000		30000
+prt5		110000		30000;
+
+param:		cap_V		c_V :=
+vsl1		390000		120000
+vsl2		330000		115000
+vls3		250000		125000
+vsl4		270000		100000;	

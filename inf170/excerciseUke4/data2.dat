@@ -1,0 +1,31 @@
+data; 
+
+set CITIES := WIS MEM FRE UKN ALA PIT NEW PEO ; 
+
+set LINKS := (WIS, MEM) (WIS, UKN) (WIS, PIT) (ALA, UKN) (ALA, MEM) (ALA, PIT)
+			 (MEM, PIT) (MEM, FRE) (MEM, PEO) (MEM, NEW) (PIT, MEM) (PIT, NEW)
+			 (PIT, FRE) (PIT, PEO) ; 
+			 
+param supply default 0 := WIS 1000, ALA 1000 ; 
+
+param demand default 0 := 
+	FRE 450, PEO 500, NEW 610, UKN 440 ;
+
+param: 		   cost  	capacity 	:= 
+	WIS MEM 	7 		Infinity
+	WIS UKN 	0 		Infinity
+	WIS PIT 	8       Infinity
+	
+	ALA UKN 	0		Infinity
+	ALA PIT 	7 		Infinity
+	ALA MEM		4		Infinity
+	
+	PIT MEM		0			25
+	PIT FRE 	29		Infinity 
+	PIT PEO		8		Infinity
+	PIT NEW		5		Infinity
+	
+	MEM PIT		0			25 
+	MEM FRE		25 		Infinity
+	MEM PEO		6		Infinity
+	MEM NEW		17 		Infinity ; 
