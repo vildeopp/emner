@@ -45,30 +45,25 @@ def new_random_sol(data):
             routes.append(route)
 
     diff = avail_vehicles - count
-    print("org", routes)
     for _ in range(diff):
         routes.append([])
-    print("new", routes)
-    return full_route(routes)
+    return full_route(routes, data)
 
-def full_route(routes):
+def full_route(routes, data):
     route = []
-    for r in routes:
-        route += r
-        route.append(0)
-        print("index", routes.index(r))
-    return route
-
-def combine_routes(routes):
-    route = []
-    for r in routes:
-        if not r and routes.index(r) != len(routes):
-            route.append(0)
-            continue
-        if routes.index(r) == len(routes):
-            route = route + r
+    for i in range(len(routes)):
+        if i == data['n_vehicles']:
+            route = route + routes[i]
         else:
-            route = route + r
+            route = route + routes[i]
             route.append(0)
-
     return route
+
+
+def random_dummy_route(data):
+    route = random.sample(range(1, data['n_calls'] + 1), data['n_calls'])
+    full_route = route + route
+    for _ in range(data['n_vehicles']):
+        full_route.insert(0, 0)
+
+    return full_route
