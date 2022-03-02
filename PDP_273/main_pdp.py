@@ -2,6 +2,7 @@
 import random_solution_gen as rnd
 import random_initializer as rnd_init
 import PDP_utils as pdp
+import operators as o
 
 file1 = "data/Call_7_Vehicle_3.txt"
 file2 = "data/Call_18_Vehicle_5.txt"
@@ -11,9 +12,14 @@ file5 = "data/Call_130_Vehicle_40.txt"
 file6 = "data/Call_300_Vehicle_90.txt"
 
 def main():
-    problem = pdp.load_problem(file5)
-    init = rnd.random_dummy_route(problem)
-    rnd_init.random_init(init, 10, problem)
+    problem = pdp.load_problem(file1)
+    #init = rnd.random_dummy_route(problem)
+    init = rnd.new_random_sol(problem)
+    init2 = rnd.random_dummy_route(problem)
+    print("init", init)
+    #print("Reinserted", o.reinsert(sorted(init2), problem))
+    #print("two exchange: ", o.two_exchange(init2, problem))
+    print("three exchange: ", o.three_exhcange(init, problem))
 
 if __name__ == '__main__':
     main()
