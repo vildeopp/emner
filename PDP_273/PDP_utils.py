@@ -91,8 +91,6 @@ def load_problem(filename):
     }
     return output
 
-def read_problem():
-    return load_problem(file1)
 
 
 def feasibility_check(solution, problem):

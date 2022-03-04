@@ -1,4 +1,6 @@
 import random
+
+from numpy import full
 def random_sol(data):
     route = random.sample(range(1, data['n_calls'] + 1), data['n_calls'])  # deciding the route
     rand_index = random.sample(range(1, data['n_calls']), data['n_vehicles'] )  # for placing the change of cars
@@ -62,7 +64,11 @@ def full_route(routes, data):
 
 def random_dummy_route(data):
     route = random.sample(range(1, data['n_calls'] + 1), data['n_calls'])
-    full_route = route + route
+    full_route = []
+    for x in route: 
+        full_route.append(x)
+        full_route.append(x)
+
     for _ in range(data['n_vehicles']):
         full_route.insert(0, 0)
 
