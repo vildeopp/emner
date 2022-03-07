@@ -1,6 +1,6 @@
-from mimetypes import init
 
-from numpy import nested_iters
+
+from mimetypes import init
 from operators import reinsert, two_exchange, three_exhcange
 from simulated_annealing import simulated_annealing
 import datetime as dt
@@ -12,14 +12,14 @@ def intitalizer(init_sol, problem, times):
 
     inital_cost = cost_function(init_sol, problem)
     
-    operators = [reinsert]
+    operators = [reinsert, two_exchange, three_exhcange]
 
     for operator in operators:
-        print("operator: ", str(operator))
+        print("operator: ", str(operator.__name__))
         print("-"*25)
 
-        best_objective = sys.maxsize
-        best_solution = []
+        best_objective = inital_cost
+        best_solution = init_sol
         avg_of_best = 0 
         feasible_of_best = False
 

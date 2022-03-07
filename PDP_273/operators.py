@@ -63,8 +63,10 @@ def reinsert(init_sol, data):
 Takes two elements either from the same vehicle or two vehicles and swaps two calls
 """
 def two_exchange(init_sol, data):
-    routes = split_routes(init_sol)
 
+    re_insertroute = reinsert(init_sol, data)
+
+    routes = split_routes(re_insertroute)
     rand_v1 = rnd.randrange(0, data['n_vehicles'] + 1)
     rand_v2 = rnd.randrange(0, data['n_vehicles'] + 1)
 
@@ -74,7 +76,9 @@ def two_exchange(init_sol, data):
             rand_v2 = rnd.randrange(0, data['n_vehicles'] + 1)
         else: 
             break
-
+    
+    
+    
     if rand_v1 == rand_v2:
         route = routes[rand_v1]
         if not route:
@@ -120,6 +124,8 @@ Chooses randomly number of vehicles and which vehciles to choose from and then e
 in the way: elem1 = elem3, elem2 = elem1, elem3 = elem2
 """
 def three_exhcange(init_sol, data):
+
+    init_sol = reinsert(init_sol, data)
     routes = split_routes(init_sol)
     # choosing how many vehicles to exchange between 1,2,3, by choosing random index with reversal
     rand_routes = list(np.random.randint(low=data["n_vehicles"], size=3))
@@ -138,15 +144,14 @@ def three_exhcange(init_sol, data):
             break
     
     if not route1 or not route2 or not route3:
-        return routes
+        return full_route(routes, data)
 
     elem1 = rnd.choice(route1)
     elem2 = rnd.choice(route2)
     elem3 = rnd.choice(route3)
-    print("old", route1, route2, route3)
-    print("elements", elem1, elem2, elem3)
+
     if elem1 == elem2 or elem2 == elem3 or elem1 == elem3:  # checks if the elements are equal
-        return routes
+        return full_route(routes, data)
 
     #sets the elements in their new positions
     for i, c in enumerate(route1):
@@ -159,7 +164,6 @@ def three_exhcange(init_sol, data):
         if c3 == elem3:
             route3[i3] = elem2
 
-    print("new", route1, route2, route3)
     routes[rand_routes[0]] = route1
     routes[rand_routes[1]] = route2
     routes[rand_routes[2]] = route3

@@ -22,6 +22,6 @@ def local_search(init_sol, problem, operator):
             objective = new_objective
 
     feasible, c = pdp.feasibility_check(solution, problem)
-    print_sol(sum_objective/1000, objective, pdp.cost_function(init_sol, problem), 0, solution, feasible)
+   
+    return solution, objective, feasible, sum_objective/1000
     
-    print("end local search\n")
