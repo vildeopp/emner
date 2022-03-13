@@ -1,3 +1,5 @@
+from collections import Counter
+
 import operators as o
 import PDP_utils as pdp
 from display import print_sol
@@ -22,6 +24,5 @@ def local_search(init_sol, problem, operator):
             objective = new_objective
 
     feasible, c = pdp.feasibility_check(solution, problem)
-   
     return solution, objective, feasible, sum_objective/1000
     

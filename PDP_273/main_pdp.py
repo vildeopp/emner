@@ -1,3 +1,4 @@
+from collections import Counter
 
 import random_solution_gen as rnd
 import random_initializer as rnd_init
@@ -16,19 +17,24 @@ file5 = "data/Call_130_Vehicle_40.txt"
 file6 = "data/Call_300_Vehicle_90.txt"
 
 def main():
-    problem = pdp.load_problem(file1)
-    #init = rnd.random_dummy_route(problem)
+    """Read problem"""
+    print("loads file")
+    problem = pdp.load_problem(file6)
+    print("finished loading file")
+
+    """Initial solutions"""
     init = rnd.new_random_sol(problem)
     init2 = rnd.random_dummy_route(problem)
-    #print("init", init)
-    #print("Reinserted", o.reinsert(init, problem))
-    #print("two exchange: ", o.two_exchange(init2, problem))
-    #print("three exchange: ", o.three_exhcange(init, problem))
-    #for _ in range(10): 
-    #    local.local_search(init, problem, o.two_exchange)
-    #print(sim.simulated_annealing(init2, problem, o.reinsert))
+
+    """Initializers for search"""
+    #print("simulated annealing")
     #s.intitalizer(init2, problem, 10)
+    print("local search")
     l.initalizer(init2, problem, 10)
 
+    #cnt = Counter([4, 4, 21, 21, 0, 30, 7, 7, 30, 29, 29, 0, 9, 9, 24, 24, 0, 16, 16, 1, 3, 3, 1, 32, 32, 0, 23, 8, 23, 27, 27, 8, 31, 31, 0, 14, 6, 6, 14, 13, 13, 0, 10, 10, 0, 35, 35, 28, 28, 20, 20, 22, 22, 11, 11, 18, 18, 19, 19, 12, 12, 17, 17, 33, 33, 15, 15, 25, 25, 2, 2, 34, 34, 5, 5, 26, 26])
+    #print([value for key, value in cnt.items() if key != 0])
+
+    #print(pdp.feasibility_check([0, 0, 0, 0, 0, 0, 0, 2, 2, 15, 15, 10, 10, 1, 1, 20, 20, 26, 26, 27, 27, 19, 19, 16, 16, 12, 12, 5, 5, 30, 30, 23, 23, 17, 17, 18, 18, 11, 11, 6, 6, 8, 8, 24, 24, 25, 25, 22, 22, 33, 33, 31, 31, 32, 32, 21, 21, 28, 28, 9, 9, 3, 3, 29, 29, 35, 35, 14, 14, 34, 34, 13, 13, 4, 4, 7, 7], problem))
 if __name__ == '__main__':
     main()

@@ -1,5 +1,5 @@
 import sys
-from operators import reinsert, two_exchange, three_exhcange
+from operators import reinsert, two_exchange, three_exchange
 from PDP_utils import cost_function
 from localsearch import local_search
 import datetime as dt
@@ -8,10 +8,10 @@ from display import print_sol
 
 def initalizer(init_sol, problem, iterations): 
     inital_cost = cost_function(init_sol, problem)
-    operators = [reinsert, two_exchange, three_exhcange]
+    operators = [reinsert, two_exchange, three_exchange]
 
     for operator in operators: 
-        print("operator: ", operator)
+        print("operator: ", operator.__name__)
         print("-"*25)
 
         best_sol = init_sol
