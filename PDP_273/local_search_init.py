@@ -19,7 +19,7 @@ def initalizer(init_sol, problem, iterations):
         avg_of_best = 0 
         feasible_of_best = False 
 
-        best_runtime = sys.maxsize
+        best_runtime = 0
 
         for i in range(iterations):
             print("iteration " , i+1)
@@ -34,8 +34,8 @@ def initalizer(init_sol, problem, iterations):
                 avg_of_best = avg_objective
 
             runtime = (stop_time - start_time).total_seconds()
+            best_runtime += runtime
 
-            if runtime < best_runtime: 
-                best_runtime = runtime 
+        avg_runtime = best_runtime/iterations
 
-        print_sol(avg_of_best, best_obj, inital_cost, best_runtime, best_sol, feasible_of_best)
+        print_sol(avg_of_best, best_obj, inital_cost, avg_runtime, best_sol, feasible_of_best)

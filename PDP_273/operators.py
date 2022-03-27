@@ -88,7 +88,7 @@ def two_exchange(init_sol, data):
         if not route:
             return full_route(routes, data)
         else:
-            if len(routes) >= 4:
+            if len(route) >= 4:
                 elems = rnd.sample(route, 2)
                 elem1, elem2 = elems[0], elems[1]
                 if elem1 == elem2:

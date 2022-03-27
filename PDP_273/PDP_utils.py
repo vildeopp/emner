@@ -15,27 +15,30 @@ def load_problem(filename):
     E = []
     with open(filename) as f:
         lines = f.readlines()
+
         num_nodes = int(lines[1])
         num_vehicles = int(lines[3])
         num_calls = int(lines[num_vehicles + 5 + 1])
 
         for i in range(num_vehicles):
-            A.append(lines[1 + 4 + i].split(','))
+            A.append(lines[1 + 4 + i].split(',')) #each vehicle: home node, starting time
 
         for i in range(num_vehicles):
-            B.append(lines[1 + 7 + num_vehicles + i].split(','))
+            B.append(lines[1 + 7 + num_vehicles + i].split(',')) # 0= vehcile_id, the available nodes for each vehicle
 
         for i in range(num_calls):
-            C.append(lines[1 + 8 + num_vehicles * 2 + i].split(','))
+            C.append(lines[1 + 8 + num_vehicles * 2 + i].split(',')) #call info
 
         for j in range(num_nodes * num_nodes * num_vehicles):
+            #vehicle, origin node, destination node, travel time (in hours), travel cost (in Euro)
             D.append(lines[1 + 2 * num_vehicles + num_calls + 9 + j].split(','))
 
         for i in range(num_vehicles * num_calls):
+            #vehicle, call, origin node time (in hours), origin node costs (in Euro), destination node time (in hours), destination node costs (in Euro)
             E.append(lines[1 + 1 + 2 * num_vehicles + num_calls + 10 + j + i].split(','))
         f.close()
 
-    Cargo = np.array(C, dtype=np.double)[:, 1:]
+    Cargo = np.array(C, dtype=np.double)[:, 1:] #fjerner call_id, førsteliste = call 1 osv
     D = np.array(D, dtype=np.int)
 
     TravelTime = np.zeros((num_vehicles + 1, num_nodes + 1, num_nodes + 1))
@@ -44,7 +47,7 @@ def load_problem(filename):
         TravelTime[D[j, 0]][D[j, 1], D[j, 2]] = D[j, 3]
         TravelCost[D[j, 0]][D[j, 1], D[j, 2]] = D[j, 4]
 
-    VesselCapacity = np.zeros(num_vehicles)
+    VesselCapacity = np.zeros(num_vehicles) #creates a new array with length = num_vehicles
     StartingTime = np.zeros(num_vehicles)
     FirstTravelTime = np.zeros((num_vehicles, num_nodes))
     FirstTravelCost = np.zeros((num_vehicles, num_nodes))
@@ -204,14 +207,16 @@ def cost_function(Solution, problem):
             if NoDoubleCallOnVehicle > 0:
                 sortRout = np.sort(currentVPlan, kind='mergesort')
                 I = np.argsort(currentVPlan, kind='mergesort')
+
                 Indx = np.argsort(I, kind='mergesort')
 
+
                 PortIndex = Cargo[sortRout, 1].astype(int)
+
                 PortIndex[::2] = Cargo[sortRout[::2], 0]
                 PortIndex = PortIndex[Indx] - 1
 
                 Diag = TravelCost[i, PortIndex[:-1], PortIndex[1:]]
-
                 FirstVisitCost = FirstTravelCost[i, int(Cargo[currentVPlan[0], 0] - 1)]
                 RouteTravelCost[i] = np.sum(np.hstack((FirstVisitCost, Diag.flatten())))
                 CostInPorts[i] = np.sum(PortCost[i, currentVPlan]) / 2
