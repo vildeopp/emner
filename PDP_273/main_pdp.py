@@ -38,17 +38,22 @@ def main():
 
     travelCost = problem['TravelCost']
     vesselCargo = problem['VesselCargo']
+    cargo = problem['Cargo']
+    a = problem['PortCost']
 
-    print("simulated annealing equal weights ")
-    s.initializer_weigths(init2, problem, 3)
+    
 
+    #print("cheapest car", route.find_cheapest_transport(7,init2, problem))
 
+    
+    #print("expenses of calls", route.cost_of_calls_vehicle([1,1,4,4,5,5], 1, problem))
+    print("chosen call", route.choose_call(1, [1,1,3,3,4,4], problem))
+  
 
+    
 
-
-
-
-
+    #print("simulated annealing equal weights ")
+    #s.initializer_weigths(init2, problem, 1)
 
 if __name__ == '__main__':
     main()

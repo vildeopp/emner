@@ -3,8 +3,7 @@ import random as rnd
 import math
 from display import print_sol
 from statistics import mean
-from own_operators import allocate_dummy_call, replace_vehicles_calls, rearrange_vehicles_calls, \
-    insert_most_expensive_from_dummy, two_exchange_reinsert
+from own_operators import replace_vehicles_calls, try_for_best_for_each_vehicle, two_exchange_reinsert, try_for_best_dummy_insert
 import random
 from tqdm import tqdm
 from operators import two_exchange
@@ -75,6 +74,7 @@ def simulated_annealing(init_sol, problem, operator):
 
 
 def simulated_annealing_equal_weigths(init_sol, problem):
+    pbar = tqdm(total=10000, position=0, leave=True)
     Tf = 0.1  # final temperature
     incumbent = init_sol
     inc_objective = pdp.cost_function(incumbent, problem)
@@ -85,10 +85,13 @@ def simulated_annealing_equal_weigths(init_sol, problem):
 
     sum_objectives = pdp.cost_function(init_sol, problem)
 
+    last_impr = 0 
+
     p1 = 0.33
     p2 = 0.66
 
     for _ in range(100):
+        pbar.update(1)
         new_solution = choose_operator(incumbent, problem)
         objective = pdp.cost_function(new_solution, problem)
 
@@ -101,6 +104,7 @@ def simulated_annealing_equal_weigths(init_sol, problem):
             if inc_objective < best_objective:
                 best_objective = inc_objective
                 best_solution = incumbent
+                last_impr = _
         elif feasible:
             rand = rnd.random()
             if rand < 0.8:
@@ -114,6 +118,7 @@ def simulated_annealing_equal_weigths(init_sol, problem):
     t = t_null
 
     for _ in range(9900):
+        pbar.update(1)
         new_solution = choose_operator(incumbent, problem)
         objective = pdp.cost_function(new_solution, problem)
 
@@ -126,6 +131,7 @@ def simulated_annealing_equal_weigths(init_sol, problem):
             if inc_objective < best_objective:
                 best_objective = inc_objective
                 best_solution = incumbent
+                last_impr = _
         elif feasible:
             rand = rnd.random()
             p = math.pow(math.e, (-delta_E / t))
@@ -133,6 +139,8 @@ def simulated_annealing_equal_weigths(init_sol, problem):
                 incumbent = new_solution
                 inc_objective = objective
             t = alpha * t
+
+    print("last improvement", last_impr)
 
     return best_solution, best_objective, pdp.feasibility_check(best_solution, problem)
 
@@ -142,9 +150,9 @@ def choose_operator(incumbent, problem):
     p2 = 0.66
     prob = random.uniform(0, 1)
     if prob < p1:
-        new_solution = insert_most_expensive_from_dummy(incumbent, problem)
+        new_solution = try_for_best_dummy_insert(incumbent, problem)
     elif p1 < prob < p2:
-        new_solution = two_exchange(incumbent, problem)
+        new_solution = try_for_best_for_each_vehicle(incumbent, problem)
     else:
         new_solution = two_exchange_reinsert(incumbent, problem)
 

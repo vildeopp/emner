@@ -51,7 +51,7 @@ def initializer_weigths(init_sol, problem, iterations):
     objectives = 0
 
     for _ in range(iterations):
-        print("iterations", _)
+        print("iterations", _+1)
         start = dt.datetime.now()
         new_solution, new_objective, new_feasible = simulated_annealing_equal_weigths(solution, problem)
 

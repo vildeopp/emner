@@ -1,41 +1,15 @@
 import random
 import sys
 from itertools import permutations
+import copy
 
 import numpy as np
-from route_operators import split_routes, full_route, get_expense_of_not_transporting_call
+from route_operators import split_routes, full_route, get_expense_of_not_transporting_calls, choose_call, choose_vehicle
+
 from PDP_utils import cost_function, feasibility_check
 from own_utils import cost_route
 from operators import reinsert
-
-
-def allocate_dummy_call(solution: list, problem: dict) -> list:
-    """
-    Allocates one call in the dummy vehicle to the first valid vehicle
-    """
-    routes = split_routes(solution)
-    dummy = routes[-1]
-    if not dummy:
-        return solution
-
-    elem = random.choice(dummy)
-    new_dummy = [x for x in dummy if x != elem]
-    routes[-1] = new_dummy
-
-    vesselCargo = problem['VesselCargo']
-    vehcile = 0
-    insert_route = []
-    for i, calls in enumerate(vesselCargo):
-        if calls[elem - 1] == float(1):
-            insert_route = routes[i]
-            vehcile = i
-            break
-
-    insert_route.append(elem)
-    insert_route.append(elem)
-
-    routes[vehcile] = insert_route
-    return full_route(routes, data=problem)
+from PDP_utils import cost_function, feasibility_check
 
 
 def replace_vehicles_calls(solution, problem):
@@ -59,8 +33,7 @@ def replace_vehicles_calls(solution, problem):
             if vesselCargo[vehicle, call - 1] == float(1):
                 remove = [x for x in remove if x != call]
                 break
-            pos_calls = [x for x in pos_calls if
-                         x != call]  # removes the call if it is not possible to add it to vehicle
+            pos_calls = [x for x in pos_calls if x != call]  # removes the call if it is not possible to add it to vehicle
             if not pos_calls:
                 return solution
 
@@ -77,108 +50,28 @@ def replace_vehicles_calls(solution, problem):
     return full_route(routes, problem)
 
 
-def rearrange_vehicles_calls(solution, problem):
-    """
-    takes a random vehicle in route and rearranges the calls in its route, if there are more than two different calls (4 elements in the list)
-    """
-
-    routes = split_routes(solution)
-
-    vehicle = random.randrange(0, problem['n_vehicles'] - 1)
-    route = routes[vehicle]
-    if not route or len(route) < 4:
-        for _ in range(10):
-            vehicle = random.randrange(0, problem['n_vehicles'] - 1)
-            route = routes[vehicle]
-            if len(route) >= 4:
-                break
-
-    random.shuffle(route)
-    routes[vehicle] = route
-    if feasibility_check(full_route(routes, data=problem), problem):
-        return full_route(routes, data=problem)
-    else:
-        for _ in range(20):
-            random.shuffle(route)
-            if feasibility_check(route, problem):
-                routes[vehicle] = route
-                break
-
-    return full_route(routes, data=problem)
-
-
-def insert_most_expensive_from_dummy(solution, problem):
-    routes = split_routes(solution)
-    if len(routes) == problem['n_vehicles']:
-        return solution
-
-    dummy_route = routes[-1]
-    if not dummy_route:
-        return solution
-
-    dummy_route.sort()  # sort the dummy route so that the indices in the list below match the calls in the dummy route
-    expenses = [get_expense_of_not_transporting_call(x, problem) for x in set(dummy_route)]
-
-    most_expensive = dummy_route[expenses.index(max(expenses))]
-    if most_expensive == 0:
-        return solution
-
-    dummy_route = [x for x in dummy_route if x != most_expensive]
-    routes[-1] = dummy_route
-
-    vesselCargo = problem['VesselCargo']
-
-    for v in range(problem['n_vehicles']):
-        if bool(vesselCargo[v, most_expensive - 1]):
-            insert_route = routes[v]
-            if len(insert_route) < 2:
-                insert_route.append(most_expensive)
-                insert_route.append(most_expensive)
-            else:
-                idx1 = random.randrange(len(insert_route))
-                insert_route.insert(idx1, most_expensive)
-                insert_route.insert(idx1 + 1, most_expensive)
-
-            routes[v] = insert_route
-            break
-
-    return full_route(routes, problem)
-
-
-def find_cheapest_transport(call, problem):
-    """Use this method to insert pickup and delivery right after each other"""
-    calls = [call, call]
-    cargo = problem['VesselCargo']
-
-    cheapest = sys.maxsize
-    vehicle = 0
-
-    for v in range(problem['n_vehicles']):
-        if cargo[v, call - 1] == float(1):
-            if cost_route(calls, v, problem) < cheapest:
-                cheapest = cost_route(calls, v, problem)
-                vehicle = v
-        else:
-            continue
-
-    return vehicle + 1
-
 def two_exchange_reinsert(solution, problem):
+    """Measure the length of each route and takes the shortest and the longest, if the shortest have 0 calls
+    takes one from the longest and adds to that vehicle. If both routes has more than one call
+    do not include dummy pr. now"""
 
     solution = reinsert(solution, problem)
     routes = split_routes(solution)
     lengths = list(map(len, routes[0:problem['n_vehicles']]))
 
-    v1 = lengths.index(max(lengths))
-    v2 = lengths.index(min(lengths))
+    max_len = max(lengths)
+    min_len = min(lengths)
 
-    if v2 == 0:
+    v1 = lengths.index(max_len)
+    v2 = lengths.index(min_len)
+
+    if max_len == 0:
         return full_route(routes, problem)
 
     vesselCargo = problem['VesselCargo']
 
     #When to reinsert? -> when the smallest list is empty? (some kind of ratio between max and min length)
-    if not routes[v2]:
+    if abs(max_len-min_len) > problem['n_calls']/2:
         v1_route = routes[v1]
         elem = random.choice(v1_route)
         for _ in range(10): #try 10 times to find å feasible call
@@ -195,7 +88,6 @@ def two_exchange_reinsert(solution, problem):
         v2_route.append(elem)
 
         routes[v2] = v2_route
-
     else:
 
         v1_route = routes[v1]
@@ -233,7 +125,107 @@ def two_exchange_reinsert(solution, problem):
 
     return full_route(routes, data = problem)
 
-    #else find the cheapest car to exchange the calls with ?
+
+def try_for_best_dummy_insert(solution:list, problem:dict) -> list: 
+    solutions = []
+
+    get_expenses = get_expense_of_not_transporting_calls(problem)
+
+    routes = split_routes(solution)
+    dummy_route = routes[-1]
+
+    #find most expensive call
+    most_expensive = 0
+    for call in get_expenses.keys(): 
+        if call in dummy_route: 
+            most_expensive = call 
+            break
+    
+    if most_expensive == 0: 
+        return solution
+
+    for v in range(problem['n_vehicles']+1): 
+        sol = insert_call_to_vehicle(solution, v, most_expensive, problem)
+        f,c = feasibility_check(sol, problem)
+        if f: 
+            solutions.append(sol)
+        
+    
+    best_solution = solution
+    cost = cost_function(solution, problem)
+
+    for sol in solutions: 
+        cost_new = cost_function(sol, problem)
+        if cost_new < cost: 
+            return sol
+    
+    return best_solution
+
+def insert_call_to_vehicle(init_solution:list, v_id:int, call:int, problem:dict) -> list: #removes the call from solution
+    solution = [x for x in init_solution if x != call]
+    routes = split_routes(solution)
+    
+    route = routes[v_id-1]
+
+    if not route: 
+        route.append(call)
+        route.append(call)
+        routes[v_id-1] = route
+        return full_route(routes, problem)
+
+    pos_solutions = []
+    new_routes = copy.deepcopy(routes)
+    cost = cost_function(init_solution, problem)
+
+    if v_id-1 == problem['n_vehicles']:  #if the vehicle is dummy order has nothing to say for cost
+        route.append(call)
+        route.append(call)
+        routes[-1] = route 
+        return full_route(routes, problem)
+
+    for pos_idx in range(len(route)): 
+        new_new_routes = copy.deepcopy(new_routes)
+        new_new_routes[v_id-1].insert(pos_idx, call)
+        new_new_routes[v_id-1].insert(pos_idx+1, call)
+        full_new_route = full_route(new_new_routes, problem)
+        if full_new_route not in pos_solutions:
+            f, c = feasibility_check(full_new_route, problem)
+            cost_sol = cost_function(full_new_route, problem)
+            if f and cost_sol < cost: 
+                return full_new_route
+
+    best_solution = init_solution
+    cost = cost_function(init_solution, problem)
+
+    for sol in pos_solutions: 
+        new_cost = cost_function(sol, problem)
+        if new_cost < cost: 
+            return sol
+
+    return best_solution
+    
+        
+def try_for_best_for_each_vehicle(solution:list, problem:dict) -> list: 
+
+    call = random.randrange(1, problem['n_calls']) 
+
+    v = random.randrange(1, problem['n_vehicles']+1)
+    pos_solution = insert_call_to_vehicle(solution, v, call, problem)
+    cost = cost_function(solution, problem)
+    cost_sol = cost_function(pos_solution, problem)
+    if cost_sol < cost: 
+        return pos_solution 
+
+    return solution
+
+    
+
+    
+    
+
+ 
+
+
 
 
 
