@@ -1,6 +1,6 @@
 from collections import Counter
 
-import operators as o
+import basic_operators as o
 import PDP_utils as pdp
 from display import print_sol
 

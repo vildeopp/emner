@@ -3,7 +3,7 @@ import statistics
 import datetime as dt
 import sys
 
-from operators import reinsert, two_exchange, three_exchange
+from basic_operators import reinsert, two_exchange, three_exchange
 from simulated_annealing import simulated_annealing, simulated_annealing_equal_weigths
 from PDP_utils import cost_function, feasibility_check
 from display import print_sol
@@ -53,7 +53,7 @@ def initializer_weigths(init_sol, problem, iterations):
     for _ in range(iterations):
         print("iterations", _+1)
         start = dt.datetime.now()
-        new_solution, new_objective, new_feasible = simulated_annealing_equal_weigths(solution, problem)
+        new_solution, new_objective, new_feasible = simulated_annealing_equal_weigths(init_sol, problem)
 
         stop = dt.datetime.now()
         total = (stop-start).total_seconds()

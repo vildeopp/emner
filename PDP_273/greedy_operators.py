@@ -1,14 +1,13 @@
 import random
-import sys
-from itertools import permutations
 import copy
+from turtle import pos
 
 import numpy as np
-from route_operators import split_routes, full_route, get_expense_of_not_transporting_calls, choose_call, choose_vehicle
+from route_operators import split_routes, full_route, get_expense_of_not_transporting_calls, choose_call, choose_vehicle, choose_call_from_dummy
 
 from PDP_utils import cost_function, feasibility_check
 from own_utils import cost_route
-from operators import reinsert
+from basic_operators import reinsert
 from PDP_utils import cost_function, feasibility_check
 
 
@@ -22,7 +21,7 @@ def replace_vehicles_calls(solution, problem):
     vehicle = length.index(min(length))
     add = routes[vehicle]
 
-    call = random.choice(remove)
+    call = choose_call(vehicle_remove, remove, problem)
     vesselCargo = problem['VesselCargo']
     pos_calls = remove
     if vesselCargo[vehicle, call - 1] == float(1):
@@ -64,108 +63,51 @@ def two_exchange_reinsert(solution, problem):
 
     v1 = lengths.index(max_len)
     v2 = lengths.index(min_len)
-
     if max_len == 0:
         return full_route(routes, problem)
 
     vesselCargo = problem['VesselCargo']
-
+    
     #When to reinsert? -> when the smallest list is empty? (some kind of ratio between max and min length)
     if abs(max_len-min_len) > problem['n_calls']/2:
         v1_route = routes[v1]
-        elem = random.choice(v1_route)
-        for _ in range(10): #try 10 times to find å feasible call
-            if bool(vesselCargo[v2, elem-1]):
-                break
-            else:
-                elem = random.choice(v1_route)
-
-        v1_route = [x for x in v1_route if x != elem]
-        routes[v1] = v1_route
-        v2_route = routes[v2]
-
-        v2_route.append(elem)
-        v2_route.append(elem)
-
-        routes[v2] = v2_route
+        elem = choose_call(v1, v1_route, problem)
+        sol = insert_call(solution, v1, elem, problem)
+        return sol
     else:
-
         v1_route = routes[v1]
         v2_route = routes[v2]
-
         if len(v1_route) > 2 and len(v2_route) > 2:
-            elem1 = random.choice(v1_route)
+            elem1 = choose_call(v1, v1_route, problem)
+            elem2 = choose_call(v2, v2_route, problem)
 
-            #looks for valid calls
-            for _ in range(10):
-                if bool(vesselCargo[v2, elem1-1]):
-                    break
-                else:
-                    elem1 = random.choice(v1_route)
-
-            elem2 = random.choice(v2_route)
-            for _ in range(10):
-                if bool(vesselCargo[v1, elem2-1]):
-                    break
-                else:
-                    elem2 = random.choice(v2_route)
-
-            if not bool(vesselCargo[v1, elem2-1]) or not bool(vesselCargo[v2,elem1-1]):
-                return full_route(routes, problem)
-
-            for i1, c1 in enumerate(v1_route):
-                if c1 == elem1:
-                    v1_route[i1] = elem2
-            for i2, c2 in enumerate(v2_route):
-                if c2 == elem2:
-                    v2_route[i2] = elem1
-
-            routes[v1] = v1_route
-            routes[v2] = v2_route
+            sol1 = insert_call(solution, v1, elem2, problem)
+            end_sol = insert_call(sol1, v2, elem1, problem)
+            return end_sol
 
     return full_route(routes, data = problem)
 
 
 def try_for_best_dummy_insert(solution:list, problem:dict) -> list: 
-    solutions = []
-
     get_expenses = get_expense_of_not_transporting_calls(problem)
-
-    routes = split_routes(solution)
-    dummy_route = routes[-1]
-
-    #find most expensive call
-    most_expensive = 0
-    for call in get_expenses.keys(): 
-        if call in dummy_route: 
-            most_expensive = call 
-            break
+    most_expensive = choose_call_from_dummy(get_expenses)
     
     if most_expensive == 0: 
         return solution
 
-    for v in range(problem['n_vehicles']+1): 
-        sol = insert_call_to_vehicle(solution, v, most_expensive, problem)
-        f,c = feasibility_check(sol, problem)
-        if f: 
-            solutions.append(sol)
-        
-    
-    best_solution = solution
-    cost = cost_function(solution, problem)
-
-    for sol in solutions: 
-        cost_new = cost_function(sol, problem)
-        if cost_new < cost: 
-            return sol
-    
-    return best_solution
+    v_insert = choose_vehicle(most_expensive, problem)
+    sol = insert_call(solution, v_insert, most_expensive, problem)
+    return sol
 
 def insert_call_to_vehicle(init_solution:list, v_id:int, call:int, problem:dict) -> list: #removes the call from solution
     solution = [x for x in init_solution if x != call]
     routes = split_routes(solution)
     
     route = routes[v_id-1]
+
+    vessel_comp = problem['VesselCargo']
+    if not bool(vessel_comp[v_id-1, call-1]): 
+        return init_solution
 
     if not route: 
         route.append(call)
@@ -184,33 +126,24 @@ def insert_call_to_vehicle(init_solution:list, v_id:int, call:int, problem:dict)
         return full_route(routes, problem)
 
     for pos_idx in range(len(route)): 
-        new_new_routes = copy.deepcopy(new_routes)
+        new_new_routes = copy.deepcopy(routes)
         new_new_routes[v_id-1].insert(pos_idx, call)
         new_new_routes[v_id-1].insert(pos_idx+1, call)
         full_new_route = full_route(new_new_routes, problem)
         if full_new_route not in pos_solutions:
-            f, c = feasibility_check(full_new_route, problem)
             cost_sol = cost_function(full_new_route, problem)
-            if f and cost_sol < cost: 
+            if cost_sol < cost: 
                 return full_new_route
+        else: 
+            continue
+  
 
-    best_solution = init_solution
-    cost = cost_function(init_solution, problem)
-
-    for sol in pos_solutions: 
-        new_cost = cost_function(sol, problem)
-        if new_cost < cost: 
-            return sol
-
-    return best_solution
-    
-        
 def try_for_best_for_each_vehicle(solution:list, problem:dict) -> list: 
 
     call = random.randrange(1, problem['n_calls']) 
 
-    v = random.randrange(1, problem['n_vehicles']+1)
-    pos_solution = insert_call_to_vehicle(solution, v, call, problem)
+    v = choose_vehicle(call, problem)
+    pos_solution = insert_call(solution, v, call, problem)
     cost = cost_function(solution, problem)
     cost_sol = cost_function(pos_solution, problem)
     if cost_sol < cost: 
@@ -218,7 +151,56 @@ def try_for_best_for_each_vehicle(solution:list, problem:dict) -> list:
 
     return solution
 
+
+def insert_call(init_solution:list, v_id:int, call:int, problem:dict) -> list: 
+    if call == 0: 
+        return init_solution
+
+    solution = [x for x in init_solution if x != call]
+    routes = split_routes(solution)
+
+    v_route = routes[v_id-1]
+
+    if not v_route: 
+        v_route.append(call)
+        v_route.append(call)
+        routes[v_id-1] = v_route
+        return full_route(routes, problem)
+
+    pos_solutions = []
+
+    for idx1 in range(len(v_route)): 
+        new_routes = copy.deepcopy(routes)
+        new_route = new_routes[v_id-1]
+        new_route.insert(idx1, call)
+        new_routes[v_id-1] = new_route
+       
+        f1, c1 = feasibility_check(full_route(new_routes,problem), problem)
+        if c1 == "Time window exceeded at call": 
+            break 
+        else:
+            for idx2 in range(idx1+1, len(v_route)): 
+                new_new_routes = copy.deepcopy(routes)
+                new_route = new_new_routes[v_id-1]
+                new_route.insert(idx1, call)
+                new_route.insert(idx2, call)
+                new_new_routes[v_id-1] = new_route
+                full_new_route = full_route(new_new_routes, problem)
+                
+                pos_solutions.append(full_new_route)
     
+    
+    if not pos_solutions: 
+        return init_solution
+
+    init_cost = cost_function(init_solution, problem)
+    for sol in pos_solutions:
+        cost = cost_function(sol, problem)
+        if cost < init_cost: 
+            return sol 
+
+    return init_solution
+
 
     
     

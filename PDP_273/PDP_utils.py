@@ -166,7 +166,7 @@ def feasibility_check(solution, problem):
                     ArriveTime[j] = np.max((currentTime + RouteTravelTime[j], Timewindows[0, j]))
                     if ArriveTime[j] > Timewindows[1, j]:
                         feasibility = False
-                        c = 'Time window exceeded at call {}'.format(j)
+                        c = 'Time window exceeded at call'
                         break
                     currentTime = ArriveTime[j] + LU_Time[j]
 

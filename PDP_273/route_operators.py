@@ -50,7 +50,8 @@ def get_expense_of_not_transporting_calls( problem: dict) -> dict:
         expenses[c+1] = cargo[c][3]
     return dict(sorted(expenses.items(), key = lambda item: item[1], reverse=True))
 
-def choose_call_to_insert(expenses: dict): 
+def choose_call_from_dummy(problem): 
+    expenses = get_expense_of_not_transporting_calls(problem)
     p = random.uniform(0,1)
 
     if p < 0.7: 
@@ -75,6 +76,7 @@ def find_cheapest_transport(call:int, problem: dict) -> dict:
 
     pickup_node = int(call_info[call-1][0])
     delivery_node = int(call_info[call-1][1])
+    
     #the sum of pickup cost driving to delivery node from pickup node and delivery cost
     costs = {}
     for vehicle in range(num_vehicles): 
@@ -93,15 +95,15 @@ def find_cheapest_transport(call:int, problem: dict) -> dict:
 
 def choose_vehicle(call:int, problem: dict) -> int: 
     """Makes sure that the cheapest vehicle to insert into isn't allways chosen"""
-    costs = find_cheapest_transport()
+    costs = find_cheapest_transport(call, problem)
 
     p = random.uniform(0,1)
     if p < 0.8: 
-        return list(costs.keys())[0]
+        return list(costs.keys())[0]-1
     elif 0.8 < p < 0.9: 
-        return list(costs.keys())[0]
+        return list(costs.keys())[0]-1
     else: 
-        return random.choice(list(costs.keys()))
+        return random.choice(list(costs.keys()))-1
 
 
 def cost_of_calls_vehicle(v_route: list, v_id: int, problem: dict) -> dict: 
@@ -111,42 +113,55 @@ def cost_of_calls_vehicle(v_route: list, v_id: int, problem: dict) -> dict:
     call_info = problem['Cargo']
     port_cost = problem['PortCost']
     travel_cost = problem['TravelCost']
+    cargo = problem['Cargo']
 
-    if v_id == problem['n_vehicles']: 
-        return get_expense_of_not_transporting_calls(problem)
-
+    if not v_route: 
+        return None
+    
+    v_id = v_id
     costs = {}
-
+    if v_id == problem['n_vehicles']: 
+        for c in set(v_route): 
+            costs[c] = cargo[c-1]
+        return costs
+   
     for c in set(v_route):
-        pickup_node = int(call_info[c][0])
-        delivery_node = int(call_info[c][1])
+        pickup_node = int(call_info[c-1][0])
+        delivery_node = int(call_info[c-1][1])
 
         travel_cost_pd = travel_cost[v_id-1, pickup_node-1, delivery_node-1]
-        cost_pickup_delivery = port_cost[v_id, c]
+        cost_pickup_delivery = port_cost[v_id-1, c-1]
         cost_sum = sum([travel_cost_pd, cost_pickup_delivery])
 
         costs[c] = cost_sum
     
     return dict(sorted(costs.items(), key = lambda item: item[1], reverse=True))
 
-def choose_call(v_id:int, v_route: list, problem: dict) -> dict: 
+def choose_call(v_id:int, v_route: list, problem: dict) -> int: 
     """Makes sure that the most expensive call isn't allways chosen"""
     costs = cost_of_calls_vehicle(v_route, v_id, problem)
-    print("costs", costs)
-
+    if not v_route: 
+        return None
     p = random.uniform(0,1)
     if len(v_route) > 4: 
-        print("more than two calls in route")
         if p < 0.7: 
-            print("most expensive")
             return list(costs.keys())[0]
         elif 0.7 < p < 0.9: 
-            print("second most expensive")
             return list(costs.keys())[1]
         else: 
-            print("random choice")
             return random.choice(list(costs.keys()))
     else: 
-        print("not more than two calls in route")
         return list(costs.keys())[0]
+
+def most_expensive_for_each_car(solution, problem): 
+    most_expensive = {}
+    routes = split_routes(solution)
+    for v in range(problem['n_vehicles']+1):  #including dummy
+        costs = cost_of_calls_vehicle(routes[v], v, problem)
+        if not costs: 
+            continue
+        most_expensive[v+1] = list(costs.keys())[0]
+
+    return most_expensive
+
     

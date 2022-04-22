@@ -1,16 +1,17 @@
 import random_solution_gen as rnd
 import random_initializer as rnd_init
 import PDP_utils as pdp
-import operators as o
+import basic_operators as o
 import localsearch as local
 import simulated_annealing as sim
 import simulated_annealing_init as s
 import local_search_init as l
-import own_operators as op
+import greedy_operators as op
 import check_validity as c
 import route_operators as route
 import random
 import own_utils as own_pdp
+from operators import insert_two_exchange, remove_from_dummy
 
 file1 = "data/Call_7_Vehicle_3.txt"
 file2 = "data/Call_18_Vehicle_5.txt"
@@ -23,7 +24,7 @@ file6 = "data/Call_300_Vehicle_90.txt"
 def main():
     """Read problem"""
     print("loads file")
-    problem = pdp.load_problem(file1)
+    problem = pdp.load_problem(file5)
     print("finished loading file")
 
     """Initial solutions"""
@@ -41,19 +42,10 @@ def main():
     cargo = problem['Cargo']
     a = problem['PortCost']
 
-    
-
-    #print("cheapest car", route.find_cheapest_transport(7,init2, problem))
-
-    
-    #print("expenses of calls", route.cost_of_calls_vehicle([1,1,4,4,5,5], 1, problem))
-    print("chosen call", route.choose_call(1, [1,1,3,3,4,4], problem))
-  
-
-    
 
     #print("simulated annealing equal weights ")
-    #s.initializer_weigths(init2, problem, 1)
+    s.initializer_weigths(init2, problem, 10)
+ 
 
 if __name__ == '__main__':
     main()
