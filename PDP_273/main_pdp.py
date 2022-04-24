@@ -24,7 +24,7 @@ file6 = "data/Call_300_Vehicle_90.txt"
 def main():
     """Read problem"""
     print("loads file")
-    problem = pdp.load_problem(file5)
+    problem = pdp.load_problem(file1)
     print("finished loading file")
 
     """Initial solutions"""
@@ -44,7 +44,11 @@ def main():
 
 
     #print("simulated annealing equal weights ")
-    s.initializer_weigths(init2, problem, 10)
+    #s.initializer_weigths(init2, problem, 10)
+    liste = [2, 2, 0, 5, 5, 0, 1, 3, 3, 1, 0, 6, 6, 4, 4, 7, 7]
+    liste2 = [2, 3, 0, 5, 5, 0, 1, 3, 3, 1, 0, 6, 6, 4, 4, 7, 7]
+    print(id(liste) == id(liste2))
+
  
 
 if __name__ == '__main__':

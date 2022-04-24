@@ -1,26 +1,3 @@
-
-The operators used: 
-
-### insert_two_exchange: 
-Thought that a combination of the basic operators two exhcnage and insert would help. It measures the length of all the routes and 
-if the difference between min and max of these values are more than n_calls/2 it would take the most expensive call from the longest route and insert it into the shortest. Else it will take the most expensive calls in each route and exhcange them. 
-
-I think this is helpfull because it helps spread the calls out evenly with the combination of two exhcange and insert
-
-### remove_from_dummy
-takes one of the most expensive calls from the dummy vehicle and inserts it into a fitting vehicle. 
-
-I think this is helpfull because the initial solution contains only dummy calls and its important to remove these since they are a big cost
-
-### try_for_best 
-chooses randomly between the most expensive calls in each car and finds a fitting vehicle to insert into. Then goes through each possible index to place it at and compare the cost of these
-
-I think this is hellful because this is the most greedy operator right now and when inserting a call why not trying to find the best possible place for it at that time. 
-
-
-
-The results.
-
 Call_7_Vehicle_3.txt
 
 |                               | Average objective | Best Objective| Improvement | Runtime    |
