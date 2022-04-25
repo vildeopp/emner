@@ -12,6 +12,7 @@ import route_operators as route
 import random
 import own_utils as own_pdp
 from operators import insert_two_exchange, remove_from_dummy
+import ALNS 
 
 file1 = "data/Call_7_Vehicle_3.txt"
 file2 = "data/Call_18_Vehicle_5.txt"
@@ -45,11 +46,12 @@ def main():
 
     #print("simulated annealing equal weights ")
     #s.initializer_weigths(init2, problem, 10)
-    liste = [2, 2, 0, 5, 5, 0, 1, 3, 3, 1, 0, 6, 6, 4, 4, 7, 7]
-    liste2 = [2, 3, 0, 5, 5, 0, 1, 3, 3, 1, 0, 6, 6, 4, 4, 7, 7]
-    print(id(liste) == id(liste2))
 
- 
+    
+    print(ALNS.adaptive_large_neighborhood_search(problem))
+
+
+
 
 if __name__ == '__main__':
     main()
