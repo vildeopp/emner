@@ -3,7 +3,8 @@ import copy
 from turtle import pos
 
 import numpy as np
-from route_operators import split_routes, full_route, get_expense_of_not_transporting_calls, choose_call, choose_vehicle, choose_call_from_dummy
+from route_operators import split_routes, full_route, get_expense_of_not_transporting_calls, \
+    choose_call, choose_vehicle, choose_call_from_dummy
 
 from PDP_utils import cost_function, feasibility_check
 from own_utils import cost_route
@@ -89,8 +90,7 @@ def two_exchange_reinsert(solution, problem):
 
 
 def try_for_best_dummy_insert(solution:list, problem:dict) -> list: 
-    get_expenses = get_expense_of_not_transporting_calls(problem)
-    most_expensive = choose_call_from_dummy(get_expenses)
+    most_expensive = choose_call_from_dummy(problem)
     
     if most_expensive == 0: 
         return solution
@@ -188,7 +188,6 @@ def insert_call(init_solution:list, v_id:int, call:int, problem:dict) -> list:
                 full_new_route = full_route(new_new_routes, problem)
                 
                 pos_solutions.append(full_new_route)
-    
     
     if not pos_solutions: 
         return init_solution

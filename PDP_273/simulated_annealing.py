@@ -151,8 +151,8 @@ def simulated_annealing_equal_weigths(init_sol, problem):
 
 
 def choose_operator(incumbent, problem):
-    p1 = 0.35
-    p2 = 0.85
+    p1 = 0.33
+    p2 = 0.33
     prob = random.uniform(0, 1)
     if prob < p1:
         new_solution = remove_from_dummy(incumbent, problem)

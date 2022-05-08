@@ -210,8 +210,11 @@ def cost_function(Solution, problem):
 
                 Indx = np.argsort(I, kind='mergesort')
 
-
-                PortIndex = Cargo[sortRout, 1].astype(int)
+                try:
+                    PortIndex = Cargo[sortRout, 1].astype(int)
+                except Exception:
+                    print(sortRout)
+                    print(Exception)
 
                 PortIndex[::2] = Cargo[sortRout[::2], 0]
                 PortIndex = PortIndex[Indx] - 1

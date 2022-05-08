@@ -5,8 +5,9 @@ from tqdm import tqdm
 
 from random_solution_gen import random_dummy_route
 from PDP_utils import cost_function, feasibility_check 
-from operators import insert_two_exchange, try_for_best, remove_from_dummy
+from operators import insert_two_exchange, try_for_best, remove_from_dummy, remove_k_calls, escape
 from basic_operators import reinsert, two_exchange, three_exchange
+from greedy_operators import try_for_best_dummy_insert, try_for_best_for_each_vehicle
 from display import print_sol
 import matplotlib.pyplot as plt
 
@@ -27,6 +28,7 @@ def adaptive_large_neighborhood_search(problem):
     total_used = []
     
     avail_operators = operators()
+    #initializes the weights and data on the operators
     for i in range(len(avail_operators)): 
         curr_weights.append(1.0 / len(avail_operators))
         used.append(0)
@@ -35,19 +37,20 @@ def adaptive_large_neighborhood_search(problem):
     prev_w = curr_weights.copy()
     i_since_new_sol, div_its = 0,0
 
-    a = 0.998 
-    t = 70
+    a = 0.9998 
+    t = 90
     temps = [t]
 
     global solutions_found
     solutions_found = set()
     
-    pbar = tqdm(total=25000, position=0, leave=True)
+    pbar = tqdm(total=10000, position=0, leave=True)
 
     sol = initial 
     sol_cost = initial_cost
     
-    for it in range(25000): 
+    for it in range(10000): 
+        best_it = 0
         pbar.update(1)
        
         #updates weights
@@ -58,17 +61,22 @@ def adaptive_large_neighborhood_search(problem):
 
         #TO DO! diversification operator
         if i_since_new_sol == div_rate: 
-            for _ in range(10): 
-                sol = reinsert(sol, problem)
+            sol = escape(sol, problem)
             div_its += 1 
+            i_since_new_sol = 0 
 
         #chooses operator   
-        operation = choose_operator(avail_operators, prev_w, used, total_used \
+        operation = choose_operator(avail_operators, prev_w, curr_weights, used, total_used \
             , sol, problem, sol_cost, best_cost)
 
         #updates variables
         new_sol, new_cost, curr_weights, used, total_used = operation[0], operation[1], operation[2], operation[3], operation[4]
         feas, c = feasibility_check(new_sol, problem)
+
+        if len(list(set(new_sol))) < 8: 
+            print("feil i løsningen", new_sol)
+            break
+
 
         #acceptance criteria 
         delta = new_cost - sol_cost
@@ -97,16 +105,19 @@ def adaptive_large_neighborhood_search(problem):
         total_used_operators[avail_operators[idx]] = total_used[idx]
 
     print(total_used_operators)
-    plot(temps)
-    return [best, best_cost]
+    print("diversification iterations ", div_its)
+    #plot(temps)
+    print("latest improvement", best_it)
+    return best, best_cost, 
 
 def operators():
-    return [insert_two_exchange.__name__, try_for_best.__name__, remove_from_dummy.__name__ \
-        , reinsert.__name__, two_exchange.__name__, three_exchange.__name__] 
+    return [insert_two_exchange.__name__, try_for_best.__name__ \
+        , remove_from_dummy.__name__,  two_exchange.__name__, \
+            three_exchange.__name__, remove_k_calls.__name__] 
 
 def set_parameters(): 
     refresh_weigths = 100 
-    div_rate = 200 
+    div_rate = 30
     return [refresh_weigths, div_rate]
 
 def update_weight(current, weights, index, cost_curr, cost_s, cost_best ): 
@@ -114,29 +125,32 @@ def update_weight(current, weights, index, cost_curr, cost_s, cost_best ):
         weights[index] += 2 
     id_curr = id(current)
     if id_curr not in solutions_found:
-        weights[index] += 1 
+        weights[index] += 3 
         solutions_found.add(id_curr) 
     if cost_curr < cost_best: 
-        weights[index] += 4
+        weights[index] += 7
     return weights
 
-def choose_operator(avail_operators, weights, usage, tot_usage, sol, problem, cost_s, cost_best):
+def choose_operator(avail_operators, prev_weights, weights, usage, tot_usage, sol, problem, cost_s, cost_best):
     #choose only one operator with the given weights
     current = None
-    op = random.choices(avail_operators, weights = weights, k = 1)[0]
+    op = random.choices(avail_operators, weights = prev_weights, k = 1)[0]
     if op == insert_two_exchange.__name__: 
         current = insert_two_exchange(sol, problem)
     elif op == try_for_best.__name__: 
         current = try_for_best(sol, problem)
     elif op == remove_from_dummy.__name__: 
         current = remove_from_dummy(sol, problem)
-    elif op == reinsert.__name__: 
-        current = reinsert(sol, problem)
     elif op == two_exchange.__name__: 
         current = two_exchange(sol, problem)
     elif op == three_exchange.__name__: 
         current = three_exchange(sol, problem)
-    
+    elif op == remove_k_calls.__name__: 
+        current = remove_k_calls(sol, problem)
+
+    if len(list(set(current))) < 8: 
+        print("for få calls")
+        print(op, current)
     cost_curr = cost_function(current, problem)
     op_idx = avail_operators.index(op)
     current_weight = update_weight(current, weights, op_idx, cost_curr, cost_s, cost_best)

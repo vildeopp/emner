@@ -1,7 +1,9 @@
 import copy
 import random
+import sys
 
 from PDP_utils import feasibility_check, cost_function
+from own_utils import cost_route
 
 
 def split_routes(route):
@@ -43,7 +45,7 @@ def get_routes_with_zero(solution):
     return routes
             
 
-def get_expense_of_not_transporting_calls( problem: dict) -> dict:
+def get_expense_of_not_transporting_calls(problem) -> dict:
     expenses = {}
     cargo = problem['Cargo']
     for c in range(problem["n_calls"]):
@@ -96,14 +98,47 @@ def find_cheapest_transport(call:int, problem: dict) -> dict:
 def choose_vehicle(call:int, problem: dict) -> int: 
     """Makes sure that the cheapest vehicle to insert into isn't allways chosen"""
     costs = find_cheapest_transport(call, problem)
+    return list(costs.keys())[0]
 
-    p = random.uniform(0,1)
-    if p < 0.8: 
-        return list(costs.keys())[0]-1
-    elif 0.8 < p < 0.9: 
-        return list(costs.keys())[0]-1
-    else: 
-        return random.choice(list(costs.keys()))-1
+def vehcile(call: int, solution_wo_call: list, problem: dict) -> tuple: 
+    num_vehicles = problem["n_vehicles"]
+    vesselcomp = problem["VesselCargo"]
+    split = split_routes(solution_wo_call)
+    car = 0
+    vehicles = []
+    for route in split:
+        car += 1
+        if car-1 == num_vehicles: 
+            break
+        if not bool(vesselcomp[car-1, call-1]):
+            vehicles.append(([], sys.maxsize)) 
+            continue
+        
+        if not route:
+            n_route = copy.deepcopy(route)
+            n_route.append(call)
+            n_route.append(call) 
+            cost = cost_route(n_route,car, problem)
+            vehicles.append([n_route, cost])
+
+        else: 
+            routes = []
+            for pos_i in range(len(route)):
+                new_new_route = copy.deepcopy(route)
+                new_new_route.insert(pos_i, call)
+                new_new_route.insert(pos_i+1, call)
+                routes.append(new_new_route)
+
+            costs = list(map(lambda p: cost_route(p, car, problem), routes))
+            indx_cheapest = costs.index(min(costs))
+            vehicles.append((routes[indx_cheapest], min(costs)))
+    
+    #print("cars", vehicles)
+    
+    prices = [p for r,p in vehicles]
+    #print("price", prices)
+    cheap = prices.index(min(prices))
+    return (vehicles[cheap][0], cheap)
 
 
 def cost_of_calls_vehicle(v_route: list, v_id: int, problem: dict) -> dict: 

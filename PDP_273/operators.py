@@ -1,7 +1,8 @@
-from copy import copy
+import copy
 import random
 import numpy as np
-from route_operators import most_expensive_for_each_car, split_routes, full_route, get_expense_of_not_transporting_calls, choose_call, choose_vehicle, choose_call_from_dummy
+from route_operators import most_expensive_for_each_car, split_routes, full_route, \
+    get_expense_of_not_transporting_calls, choose_call, choose_vehicle, choose_call_from_dummy, vehcile
 
 from PDP_utils import cost_function, feasibility_check
 from own_utils import cost_route
@@ -91,6 +92,46 @@ def try_for_best(init_solution, problem):
                 return sol 
     
     return init_solution
+
+
+def remove_k_calls(initial, problem): 
+
+    routes = split_routes(initial)
+    lengths = list(map(len, routes))
+   
+    longest_route = routes[lengths.index(max(lengths))]
+    if longest_route == 1: 
+        return initial 
+
+    k = random.randint(1, len(set(longest_route))+1)
+
+    chosen_calls = list(set(random.choices(list(set(longest_route)), k=k)))
+    solution_wo_calls = [x for x in initial if x not in chosen_calls]
+    routes_wo_calls = split_routes(solution_wo_calls)
+    for call in chosen_calls: 
+        copy_route = copy.deepcopy(routes_wo_calls)
+        route, v = vehcile(call, full_route(routes_wo_calls, problem), problem)
+        copy_route[v] = route 
+        routes_wo_calls = copy_route
+    return full_route(routes_wo_calls, problem)
+
+def escape(solution, problem): 
+    """take a random call and place it back in the dummy"""
+
+    calls = problem['n_calls']
+
+    random_call = random.randint(1, calls)
+    tampered_solution = [x for x in solution if x != random_call]
+    tampered_solution.insert(len(tampered_solution)+500, random_call)
+    tampered_solution.insert(len(tampered_solution)+500, random_call)
+
+    return tampered_solution
+
+
+    
+    
+
+
 
 
 

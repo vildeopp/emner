@@ -11,8 +11,9 @@ import check_validity as c
 import route_operators as route
 import random
 import own_utils as own_pdp
-from operators import insert_two_exchange, remove_from_dummy
+from operators import insert_two_exchange, remove_from_dummy, remove_k_calls, escape
 import ALNS 
+import ALNS_inititalizer 
 
 file1 = "data/Call_7_Vehicle_3.txt"
 file2 = "data/Call_18_Vehicle_5.txt"
@@ -43,14 +44,12 @@ def main():
     cargo = problem['Cargo']
     a = problem['PortCost']
 
-
-    #print("simulated annealing equal weights ")
-    #s.initializer_weigths(init2, problem, 10)
+    
+    ALNS_inititalizer.ALNS_inititalizer(problem,1)
+    #s.initializer_weigths(init2, problem, 1)
 
     
-    print(ALNS.adaptive_large_neighborhood_search(problem))
-
-
+    #print(route.vehcile(4, [x for x in init if x != 4], problem))
 
 
 if __name__ == '__main__':

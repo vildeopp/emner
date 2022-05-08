@@ -11,7 +11,6 @@ def cost_route(route, vehicle, problem):
     Cargo = problem['Cargo']
     TravelCost = problem['TravelCost']
     FirstTravelCost = problem['FirstTravelCost']
-    print(FirstTravelCost)
     PortCost = problem['PortCost']
 
 
@@ -28,11 +27,11 @@ def cost_route(route, vehicle, problem):
     i = vehicle - 1
 
     if i == num_vehicles:
-        print("dummy")
         NotTransportCost = np.sum(Cargo[currentVPlan, 3]) / 2
     else:
         if NoDoubleCallOnVehicle > 0:
             sortRout = np.sort(currentVPlan, kind='mergesort')
+            #print(sortRout)
             I = np.argsort(currentVPlan, kind='mergesort')
             Indx = np.argsort(I, kind='mergesort')
             PortIndex = Cargo[sortRout, 1].astype(int)
