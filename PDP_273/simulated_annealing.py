@@ -1,13 +1,14 @@
+import time
 import PDP_utils as pdp
 import random as rnd
 import math
 from display import print_sol
 from statistics import mean
-from greedy_operators import replace_vehicles_calls, try_for_best_for_each_vehicle, two_exchange_reinsert, try_for_best_dummy_insert
+from greedy_operators import replace_vehicles_calls, two_exchange_reinsert, try_for_best_dummy_insert
 import random
 from tqdm import tqdm
 from basic_operators import two_exchange
-from operators import insert_two_exchange, remove_from_dummy, try_for_best
+from operators import insert_two_exchange, remove_from_dummy, try_for_best, escape
 
 import matplotlib.pyplot as plt
 
@@ -75,7 +76,7 @@ def simulated_annealing(init_sol, problem, operator):
     return best_solution, best_objective, feasible, avg_objectives
 
 
-def simulated_annealing_equal_weigths(init_sol, problem):
+def simulated_annealing_equal_weigths(init_sol, problem, runtime):
 
     tempratures = [] #store each iterations tempratures to plot
     prob = []
@@ -92,7 +93,13 @@ def simulated_annealing_equal_weigths(init_sol, problem):
     sum_objectives = pdp.cost_function(init_sol, problem)
 
     last_impr = 0 
+    its_since_update = 0
 
+    #parameters 
+    div_rate = 250 
+
+    stop = time.time() + runtime 
+    
     for _ in range(100):
         pbar.update(1)
         new_solution = choose_operator(incumbent, problem)
@@ -115,14 +122,24 @@ def simulated_annealing_equal_weigths(init_sol, problem):
                 inc_objective = objective
             delta.append(delta_E)
 
-    delta_avg = mean(delta)
+    
     t_null = 0.999 #(-delta_avg) / math.log(0.8)
     alpha = pow(Tf / t_null, 1 / 9900)
     t = t_null
+    it = 0
 
-    for _ in range(9900):
+    while it < 19900 or time.time() < stop: 
+        if it == 19900: 
+            break 
+
         tempratures.append(t)
         pbar.update(1)
+
+        if its_since_update == div_rate: 
+            incumbent = escape(incumbent, problem)
+            its_since_update = 0 
+            continue
+
         new_solution = choose_operator(incumbent, problem)
         objective = pdp.cost_function(new_solution, problem)
 
@@ -135,15 +152,20 @@ def simulated_annealing_equal_weigths(init_sol, problem):
             if inc_objective < best_objective:
                 best_objective = inc_objective
                 best_solution = incumbent
-                last_impr = _
+                last_impr = it
+                its_since_update = 0
         elif feasible:
             rand = rnd.random()
             p = math.pow(math.e, (-delta_E / t))
             if rand < p:
                 incumbent = new_solution
                 inc_objective = objective
+            else: 
+                its_since_update += 1
             t = alpha * t
-
+        else: 
+            its_since_update += 1 
+        it += 1 
     print("last improvement", last_impr) 
 
     #plot_data(data = tempratures)
@@ -155,14 +177,15 @@ def choose_operator(incumbent, problem):
     p2 = 0.33
     prob = random.uniform(0, 1)
     if prob < p1:
-        new_solution = remove_from_dummy(incumbent, problem)
+        new_solution = try_for_best_dummy_insert(incumbent, problem)
     elif p1 < prob < p2:
         new_solution = try_for_best(incumbent, problem)
     else:
         new_solution = insert_two_exchange(incumbent, problem)
-
     return new_solution
 
 def plot_data(data): 
     plt.plot(data)
     plt.show()
+
+

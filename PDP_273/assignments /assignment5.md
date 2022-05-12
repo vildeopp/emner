@@ -46,7 +46,7 @@ Call_18_Vehicle_5.txt
 |Simulated annealing 3-exchange |50262975.342  | 4790501.0| 46.533       |  6.730836   |
 |Simulated annealing equal weigths |4218301.4| 3455337.0  | 61.435      |  17.1105535  |
 |Simulated annealing tuned weigths |4711987.3|  3677054.0|  58.96 |   21.434 |
-|Simulated annealing tuned weigths |4700893.1|  3518566.0|  60.729 |   4.74 |
+|alns |4700893.1|  3518566.0|  60.729 |   4.74 |
 
 Best solutions: 
 

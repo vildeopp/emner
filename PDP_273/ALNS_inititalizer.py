@@ -8,7 +8,7 @@ from ALNS import adaptive_large_neighborhood_search
 from display import print_sol
 
 
-def ALNS_inititalizer(problem, iterations): 
+def ALNS_inititalizer(problem, iterations, runtime): 
     init_sol = random_dummy_route(problem)
     inital_cost = cost_function(init_sol, problem)
 
@@ -23,7 +23,7 @@ def ALNS_inititalizer(problem, iterations):
     best_runtime = sys.maxsize
     for _ in range(iterations):
         runtime_start = dt.datetime.now()
-        new_solution, new_objective = adaptive_large_neighborhood_search(problem)
+        new_solution, new_objective = adaptive_large_neighborhood_search(problem, runtime)
         runtime_stop = dt.datetime.now()
         objectives.append(new_objective)
         if new_objective < best_objective:

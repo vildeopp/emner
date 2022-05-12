@@ -42,7 +42,7 @@ def intitalizer(init_sol, problem, times):
 
         print_sol(avg_of_best, best_objective, inital_cost, best_runtime, best_solution, feasible_of_best)
 
-def initializer_weigths(init_sol, problem, iterations):
+def initializer_weigths(init_sol, problem, iterations, runtime):
     cost = cost_function(init_sol,problem)
     solution = init_sol
     feasible = feasibility_check(init_sol, problem)
@@ -53,7 +53,7 @@ def initializer_weigths(init_sol, problem, iterations):
     for _ in range(iterations):
         print("iterations", _+1)
         start = dt.datetime.now()
-        new_solution, new_objective, new_feasible = simulated_annealing_equal_weigths(init_sol, problem)
+        new_solution, new_objective, new_feasible = simulated_annealing_equal_weigths(init_sol, problem, runtime)
 
         stop = dt.datetime.now()
         total = (stop-start).total_seconds()

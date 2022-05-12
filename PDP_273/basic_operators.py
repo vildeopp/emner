@@ -70,7 +70,7 @@ Takes two elements either from the same vehicle or two vehicles and swaps two ca
 
 
 def two_exchange(init_sol, data):
-    re_insertroute = reinsert(init_sol, data)
+    re_insertroute = init_sol
 
     routes = split_routes(re_insertroute)
     rand_v1 = rnd.randrange(0, data['n_vehicles'] + 1)
@@ -132,7 +132,6 @@ in the way: elem1 = elem3, elem2 = elem1, elem3 = elem2
 
 def three_exchange(init_sol, data):
     # to make sure that some of the calls in the dummy vehicle is added to the other cars
-    init_sol = reinsert(init_sol, data)
     routes = split_routes(init_sol)
     # choosing how many vehicles to exchange between 1,2,3, by choosing random index with reversal
     rand_routes = list(np.random.randint(low=data["n_vehicles"], size=3))

@@ -90,13 +90,15 @@ def two_exchange_reinsert(solution, problem):
 
 
 def try_for_best_dummy_insert(solution:list, problem:dict) -> list: 
-    most_expensive = choose_call_from_dummy(problem)
-    
+    most_expensive = random.randint(1, problem['n_calls'])
+
     if most_expensive == 0: 
         return solution
 
-    v_insert = choose_vehicle(most_expensive, problem)
-    sol = insert_call(solution, v_insert, most_expensive, problem)
+    vessel_comp = problem['VesselCargo']
+    vehicles = [v for v in range(problem['n_vehicles']) if bool(vessel_comp[v, most_expensive-1])]
+    vehicle_to_insert = random.sample(vehicles, k=1).pop()
+    sol = insert_call(solution, vehicle_to_insert+1, most_expensive, problem)
     return sol
 
 def insert_call_to_vehicle(init_solution:list, v_id:int, call:int, problem:dict) -> list: #removes the call from solution
@@ -128,77 +130,71 @@ def insert_call_to_vehicle(init_solution:list, v_id:int, call:int, problem:dict)
     for pos_idx in range(len(route)): 
         new_new_routes = copy.deepcopy(routes)
         new_new_routes[v_id-1].insert(pos_idx, call)
-        new_new_routes[v_id-1].insert(pos_idx+1, call)
-        full_new_route = full_route(new_new_routes, problem)
-        if full_new_route not in pos_solutions:
-            cost_sol = cost_function(full_new_route, problem)
-            if cost_sol < cost: 
-                return full_new_route
-        else: 
-            continue
+        f1, c1 = feasibility_check(full_route(new_new_routes,problem), problem)
+        if c1 == "Time window exceeded at call": 
+            break 
+        else:
+            new_new_routes[v_id-1].insert(pos_idx+1, call)
+            full_new_route = full_route(new_new_routes, problem)
+            if full_new_route not in pos_solutions:
+                cost_sol = cost_function(full_new_route, problem)
+                if cost_sol < cost: 
+                    return full_new_route
+            else: 
+                continue
   
 
-def try_for_best_for_each_vehicle(solution:list, problem:dict) -> list: 
+def try_for_best(solution:list, problem:dict) -> list: 
 
     call = random.randrange(1, problem['n_calls']) 
 
     v = choose_vehicle(call, problem)
     pos_solution = insert_call(solution, v, call, problem)
-    cost = cost_function(solution, problem)
-    cost_sol = cost_function(pos_solution, problem)
-    if cost_sol < cost: 
-        return pos_solution 
-
-    return solution
-
+    return pos_solution
 
 def insert_call(init_solution:list, v_id:int, call:int, problem:dict) -> list: 
     if call == 0: 
         return init_solution
+    solution_wo_call = [x for x in init_solution if x != call]
+    routes = split_routes(solution_wo_call)
 
-    solution = [x for x in init_solution if x != call]
-    routes = split_routes(solution)
-
-    v_route = routes[v_id-1]
-
-    if not v_route: 
-        v_route.append(call)
-        v_route.append(call)
-        routes[v_id-1] = v_route
+    route = routes[v_id-1]
+    if not route: 
+        route.append(call)
+        route.append(call)
+        routes[v_id-1] = route
         return full_route(routes, problem)
 
-    pos_solutions = []
-
-    for idx1 in range(len(v_route)): 
+    solutions = {}
+    for idx1 in range(len(route)-1): 
         new_routes = copy.deepcopy(routes)
-        new_route = new_routes[v_id-1]
-        new_route.insert(idx1, call)
-        new_routes[v_id-1] = new_route
-       
+
+        new_routes[v_id-1].insert(idx1, call)
+
         f1, c1 = feasibility_check(full_route(new_routes,problem), problem)
         if c1 == "Time window exceeded at call": 
             break 
         else:
-            for idx2 in range(idx1+1, len(v_route)): 
-                new_new_routes = copy.deepcopy(routes)
-                new_route = new_new_routes[v_id-1]
-                new_route.insert(idx1, call)
-                new_route.insert(idx2, call)
-                new_new_routes[v_id-1] = new_route
-                full_new_route = full_route(new_new_routes, problem)
-                
-                pos_solutions.append(full_new_route)
-    
-    if not pos_solutions: 
-        return init_solution
+            for idx2 in range(idx1+1, len(route)): 
+                new_new_routes = copy.deepcopy(new_routes)
+                new_new_routes[v_id-1].insert(idx2, call)
+                new_full_route = full_route(new_new_routes, problem)
+                f, c = feasibility_check(new_full_route, problem)
+                #print(new_full_route, c)
+                if f: 
+                    new_cost = cost_function(new_full_route, problem)
+                    solutions[new_cost] = new_full_route 
 
-    init_cost = cost_function(init_solution, problem)
-    for sol in pos_solutions:
-        cost = cost_function(sol, problem)
-        if cost < init_cost: 
-            return sol 
+    best_cost = cost_function(init_solution, problem)
+    best = init_solution
+    for cost, r in solutions.items(): 
+        if cost < best_cost: 
+            best = r 
+            best_cost = cost
 
-    return init_solution
+ 
+    return best 
+
 
 
     

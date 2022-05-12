@@ -1,3 +1,5 @@
+import time
+from itertools import permutations
 import random_solution_gen as rnd
 import random_initializer as rnd_init
 import PDP_utils as pdp
@@ -11,7 +13,8 @@ import check_validity as c
 import route_operators as route
 import random
 import own_utils as own_pdp
-from operators import insert_two_exchange, remove_from_dummy, remove_k_calls, escape
+from operators import insert_two_exchange, remove_from_dummy, remove_k_calls, escape, move_to_next_vehicle
+from greedy_operators import  try_for_best
 import ALNS 
 import ALNS_inititalizer 
 
@@ -23,34 +26,24 @@ file5 = "data/Call_130_Vehicle_40.txt"
 file6 = "data/Call_300_Vehicle_90.txt"
 
 
+def get_runtime(): 
+    dict = {file1: 20, file2: 40, file3:100, file4: 240, file5: 500}
+    return dict
+
 def main():
-    """Read problem"""
-    print("loads file")
-    problem = pdp.load_problem(file1)
-    print("finished loading file")
-
     """Initial solutions"""
-    init = rnd.new_random_sol(problem)
-    init2 = rnd.random_dummy_route(problem)
-
+    problem = pdp.load_problem(file2)
+    init = rnd.random_dummy_route(problem)
     """Initializers for search"""
-    #print("simulated annealing")
-    #s.intitalizer(init2, problem, 10)
-    #print("local search")
-    #l.initalizer(init2, problem, 10)
+#   ALNS_inititalizer.ALNS_inititalizer(problem, 1, 500)
 
-    travelCost = problem['TravelCost']
-    vesselCargo = problem['VesselCargo']
-    cargo = problem['Cargo']
-    a = problem['PortCost']
+
+    for file, runtime in get_runtime().items(): 
+        print("read file", file)
+        problem = pdp.load_problem(file)
+        ALNS_inititalizer.ALNS_inititalizer(problem, 1, runtime)
 
     
-    ALNS_inititalizer.ALNS_inititalizer(problem,1)
-    #s.initializer_weigths(init2, problem, 1)
-
-    
-    #print(route.vehcile(4, [x for x in init if x != 4], problem))
-
 
 if __name__ == '__main__':
     main()
