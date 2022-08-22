@@ -16,11 +16,10 @@ def ALNS_inititalizer(problem, iterations, runtime):
     best_it = 0
     best_objective = inital_cost
     best_solution = init_sol
-    avg_of_best = best_objective*iterations
     feasible_of_best, c = feasibility_check(init_sol, problem)
     objectives = []
-
-    best_runtime = sys.maxsize
+    runtimes = 0
+    
     for _ in range(iterations):
         runtime_start = dt.datetime.now()
         new_solution, new_objective = adaptive_large_neighborhood_search(problem, runtime)
@@ -33,10 +32,9 @@ def ALNS_inititalizer(problem, iterations, runtime):
 
         total_runtime = (runtime_stop - runtime_start).total_seconds()
 
-        if total_runtime < best_runtime:
-            best_runtime = total_runtime
+        runtimes += total_runtime
 
     print("best iteration", best_it)
     print("-"*25)
 
-    print_sol(mean(objectives), best_objective, inital_cost, best_runtime, best_solution, feasible_of_best)
+    print_sol(mean(objectives), best_objective, inital_cost, runtimes/iterations, best_solution, feasible_of_best)

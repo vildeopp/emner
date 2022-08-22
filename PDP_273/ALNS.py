@@ -54,7 +54,7 @@ def adaptive_large_neighborhood_search(problem, runtime):
     stop = time.time() + runtime
     it = 0
     
-    while time.time() < stop: 
+    while time.time() < stop or it < 10000: 
 
         if it == 20000: 
             break
@@ -118,7 +118,7 @@ def adaptive_large_neighborhood_search(problem, runtime):
 
 def operators():
     return [insert_two_exchange.__name__, try_for_best_dummy_insert.__name__ \
-        , escape.__name__, shuffle_route.__name__, move_to_next_vehicle.__name__] 
+        , shuffle_route.__name__, move_to_next_vehicle.__name__, escape.__name__] 
 
 def set_parameters(): 
     refresh_weigths = 125
@@ -146,12 +146,12 @@ def choose_operator(avail_operators, prev_weights, weights, usage, tot_usage, so
         current = try_for_best_dummy_insert(sol, problem)
     elif op == try_for_best.__name__: 
         current = try_for_best(sol, problem)
-    elif op == escape.__name__: 
-        current = escape(sol, problem)
     elif op == shuffle_route.__name__:
         current = shuffle_route(sol, problem)
     elif op == move_to_next_vehicle.__name__: 
         current = move_to_next_vehicle(sol, problem)
+    elif op == escape.__name__: 
+        current = escape(sol, problem)
     #print("solution", current, "op=", op)
     cost_curr = cost_function(current, problem)
     op_idx = avail_operators.index(op)

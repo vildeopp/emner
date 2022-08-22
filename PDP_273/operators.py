@@ -22,8 +22,8 @@ def insert_two_exchange(solution: list, problem:list) -> list:
     longest_route = routes[longest_v]
     shortest_route = routes[shortest_v]
  
-
-    if abs(len(shortest_route)- len(longest_route)) > problem['n_calls']/2 or not shortest_route: 
+    ratio = problem['n_calls']/problem['n_vehicles']
+    if abs(len(shortest_route)- len(longest_route)) > problem['n_calls']/ratio or not shortest_route: 
        
         call = random.choice(longest_route)
         if not shortest_route: 
@@ -42,16 +42,6 @@ def insert_two_exchange(solution: list, problem:list) -> list:
        
         call1 = random.choice(longest_route)
         call2 = random.choice(shortest_route)
-        
-#        for i1, c1 in enumerate(shortest_route): 
-#            if c1 == call2: 
-#                shortest_route[i1] = call1
-#        for i2, c2 in enumerate(longest_route): 
-#            if c2 == call1: 
-#                longest_route[i2] = call2
-#
-#       routes[longest_v] = longest_route
-#        routes[shortest_v] = shortest_route
         sol1 = insert_call(solution, shortest_v, call1, problem)
         return insert_call(sol1, longest_v, call2, problem)
 

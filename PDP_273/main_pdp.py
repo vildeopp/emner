@@ -27,7 +27,7 @@ file6 = "data/Call_300_Vehicle_90.txt"
 
 
 def get_runtime(): 
-    dict = {file1: 20, file2: 40, file3:100, file4: 240, file5: 500}
+    dict = { file2: 40,file3:60, file4: 290}
     return dict
 
 def main():
@@ -36,12 +36,13 @@ def main():
     init = rnd.random_dummy_route(problem)
     """Initializers for search"""
 #   ALNS_inititalizer.ALNS_inititalizer(problem, 1, 500)
+   
 
 
     for file, runtime in get_runtime().items(): 
         print("read file", file)
         problem = pdp.load_problem(file)
-        ALNS_inititalizer.ALNS_inititalizer(problem, 1, runtime)
+        ALNS_inititalizer.ALNS_inititalizer(problem, 10, runtime)
 
     
 
